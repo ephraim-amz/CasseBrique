@@ -1,6 +1,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "math.h"
 
 #ifndef CASSEBRIQUE_MAP_H
 #define CASSEBRIQUE_MAP_H
@@ -14,7 +15,17 @@ typedef struct {
     int columns;
 } Map;
 
+/**
+ * @brief Structure mur
+ */
+typedef struct {
+    int x;
+    int y;
+} Mur;
+
 Map *createMap(int rows, int columns);
+
+Mur *createMur(Map *m);
 
 bool isFree(Map *m, int x, int y);
 
