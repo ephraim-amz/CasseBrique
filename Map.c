@@ -31,6 +31,18 @@ Map *createMap(int rows, int columns){
     return m;
 }
 
+Mur *createMur(Map *map){
+    Mur *m = malloc(sizeof(Mur));
+
+    *m = (Mur){
+            .x = NULL,
+            .y = NULL
+    };
+    srand(map->rows);
+    srand(map->columns);
+    return m;
+}
+
 void freeTab(int **tab, int r){
     for (int i = 0; i < r; i++){
         free(tab[i]);
