@@ -1,5 +1,6 @@
 #include "stdlib.h"
 #include "stdbool.h"
+#include "Map.h"
 
 
 #ifndef CASSEBRIQUE_BOMBE_H
@@ -19,10 +20,15 @@ typedef struct {
 
 /**
  * @brief Permet de créer une bombe
- * @param x
- * @param y
  * @return
  */
-Bombe *createBombe(int x, int y);
+Bombe *createBombe();
+
+/**
+ * @brief Permet de désactiver une bombe
+ * @param b
+ */
+void disableBombe(Bombe *b);
+
 
 #endif //CASSEBRIQUE_BOMBE_H

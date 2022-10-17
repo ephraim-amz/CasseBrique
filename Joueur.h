@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include "assert.h"
 #include "Bombe.h"
 #include "Map.h"
 
@@ -14,6 +15,7 @@ typedef struct {
     int x;
     int y;
     int nbBombes;
+    Bombe **bombes;
 } Joueur;
 
 /**
@@ -23,10 +25,9 @@ typedef struct {
  * @param x
  * @param y
  * @param nbBombes
- * @param bombes
  * @return Le nouveau joueur
  */
-Joueur *createJoueur(char *nom, int numJoueur, int x, int y, int nbBombes, Bombe *bombes);
+Joueur *createJoueur(char *nom, int numJoueur, int x, int y, int nbBombes);
 
 /**
  * @brief Libérer un joueur créé en mémoire
@@ -44,11 +45,10 @@ void free_player(Joueur *j);
 void deplacerJoueur(Joueur *j, Map *m, int direction);
 
 /**
- * @brief Déposer une bombe
- * @param j
- *
+ * @brief Permet d'activer une bombe
+ * @param b
  */
-void deposerBombe(Joueur *j);
+void enableBombe(Map *m, Bombe *b);
 
 /**
  * @brief Augmente de 1 le nombre de bombes du joueur.

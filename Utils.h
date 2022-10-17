@@ -1,7 +1,10 @@
+#include <stdlib.h>
+#include <stdio.h>
+#include "Joueur.h"
+
+
 #ifndef CASSEBRIQUE_UTILS_H
 #define CASSEBRIQUE_UTILS_H
-
-#include "Joueur.h"
 
 typedef struct {
     int row;

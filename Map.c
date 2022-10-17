@@ -35,11 +35,10 @@ Mur *createMur(Map *map){
     Mur *m = malloc(sizeof(Mur));
 
     *m = (Mur){
-            .x = NULL,
-            .y = NULL
+            .x = rand() % map->rows,
+            .y = rand() % map->columns
     };
-    srand(map->rows);
-    srand(map->columns);
+
     return m;
 }
 
@@ -52,6 +51,10 @@ void freeTab(int **tab, int r){
 
 bool isFree(Map *m, int x, int y){
     return m->tab[x][y] == 0;
+}
+
+bool isAWall(Mur *mur, int x, int y){
+    return mur->x != x && mur->y != y;
 }
 
 void freeMap(Map *m, int r){

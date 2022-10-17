@@ -29,6 +29,8 @@ Mur *createMur(Map *m);
 
 bool isFree(Map *m, int x, int y);
 
+bool isAWall(Mur *mur, int x, int y);
+
 int **createTab(int rows, int columns);
 
 void freeTab(int **tab, int r);

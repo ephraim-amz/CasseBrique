@@ -1,20 +1,31 @@
 #include "Joueur.h"
 
 
-Joueur *createJoueur(char *nom, int numJoueur, int x, int y, int nbBombes, Bombe *bombes){
+Joueur *createJoueur(char *nom, int numJoueur, int x, int y, int nbBombes){
     Joueur *j = malloc(sizeof(Joueur));
+    Bombe **b = malloc(sizeof(Bombe*));
+    for (int i = 0; i < j->nbBombes; ++i) {
+        b[i] = createBombe();
+    }
     *j = (Joueur){
             .nom = nom,
             .numJoueur = numJoueur,
             .x = x,
             .y = y,
             .nbBombes = nbBombes,
+            .bombes = b
     };
+
     return j;
 }
 
 void deposerBombe(Joueur *j){
-    j->nbBombes--;
+    if(j->nbBombes <= 0) {
+        printf("Vous n'avez pas assez de bombes");
+    } else {
+        j->nbBombes--;
+
+    }
 }
 
 void deplacerJoueur(Joueur *j, Map *m, int direction){
