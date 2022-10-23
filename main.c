@@ -11,6 +11,7 @@ int main(int argc, char** argv) {
 
     printf("%c\n", 176);
 
+    // MAP D'EXEMPLE
     int map1[][7] = {
             {2,2,2,2,2,2,2},
             {2,100,17,1,0,300,2},
@@ -20,8 +21,48 @@ int main(int argc, char** argv) {
             {2,400,0,1,26,200,2},
             {2,2,2,2,2,2,2}
     };
-
     displayMap(7, 7, map1);
+
+
+    // === BOUCLE DE JEU ===
+    int end = 0;
+    char input;
+
+    while(end != 1){
+        // TODO : Fonction Affichage ATH
+
+        // Affichage map
+        displayMap(7, 7, map1);
+
+        // Input
+        printf("Action a effectuer :");
+        scanf("&c", input);
+        fflush(stdin);
+
+        // Verif Input
+        //TODO : Fonction Vérification d'input
+        int verifInput = fonctionVerifInputQuiEstACoder();
+
+        // Si input pas OK
+        if(verifInput == 0) {
+            continue;
+        }
+
+        // TODO : Màj de la map
+
+
+        // TODO : Tik des bombes
+
+
+        // TODO : explosion des bombes (peut être mettre ça dans la fonction de tik des bombes)
+
+
+        // TODO : Màj de la map
+        
+
+        }
+
+    }
 
     return 0;
 }
