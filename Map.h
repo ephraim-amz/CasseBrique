@@ -39,4 +39,7 @@ void freeMap(Map *map, int r);
 
 void printTab(int** tab, int r, int c);
 
+
+void displayMap(int r, int c, int map[r][c]);
+
 #endif //CASSEBRIQUE_MAP_H
