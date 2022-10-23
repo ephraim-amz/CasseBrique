@@ -63,29 +63,55 @@ void freeMap(Map *m, int r){
 }
 
 
+void red(){
+    printf("\033[1;31m");
+}
+void yellow(){
+    printf("\033[1;33m");
+}
+void green(){
+    printf("\033[1;32m");
+}
+void cyan(){
+    printf("\033[1;36m");
+}
+void blue(){
+    printf("\033[1;34m");
+}
+void purple(){
+    printf("\033[1;35m");
+}
+void resetColor (){
+    printf("\033[0m");
+}
+
 /* Creation de plateaux de jeu
-// premiere map test : 7x7 :
-// 0 : vide                     (255)
-// 1 : mur destructible         (176)
-// 2 : mur infranchissable      (219)
-// 3 : J1   (80)
-// 4 : J2   (80)
-// 5 : J3   (80)
-// 6 : J4   (80)
-// 7 : bombe J1     (ò)
-// 8 : bombe J2
-// 9 : bombe J3
-// 10 : bombe J4
+// Légende :
+// 0 : vide                       (code : 255)
+// 1 : mur destructible         ░ (code : 176)
+// 2 : mur infranchissable      █ (code : 219)
+// 3 -> 9 : powerups (à définir)
+// 10 -> 99 : bombes            ó (code : 162)
+// 100 : joueur 1               1 (code : 49)
+// 200 : joueur 2               2 (code : 50)
+// 300 : joueur 3               3 (code : 51)
+// 400 : joueur 4               4 (code : 52)
+// Tout ce qui est entre 10 et 99 est une bombe
+// Le chiffre des dizaines représente la puissance de la bombe
+// Le chiffre des unités représente le compteur avant explosion
+// Quand le compteur passe à 0, la bombe explose
+// Après chaque mouvement, le compteur est décrémenté
 */
 void displayMap(int r, int c, int map[r][c]){
     int i, j;
-    int graphismesHD[] = {255, 176, 219, 80, 162};
+    int graphismesHD[] = {255, 176, 219, 162};
 
     for(i = 0; i < r; ++i){
         for (j = 0; j < c; ++j){
-            int sprite = map[i][j];
+            int elementInTheCase = map[i][j];
 
-            if (i == 0 ||i == r-1){
+            // espaces entre les cases
+            if (i == 0 || i == r-1){
                 if(j != c-1){
                     printf("%c", 219);
                 }
@@ -93,12 +119,29 @@ void displayMap(int r, int c, int map[r][c]){
                 printf(" ");
             }
 
-            if(sprite > 2 && sprite < 7){
-                printf("%c", graphismesHD[3]);
-            } else if (sprite > 6 ){
-                printf("%c", graphismesHD[4]);
+            // cases
+            if(elementInTheCase >= 100){
+                elementInTheCase /= 100;
+                switch (elementInTheCase) {
+                    case 1 :
+                        red();
+                        break;
+                    case 2 :
+                        blue();
+                        break;
+                    case 3 :
+                        green();
+                        break;
+                    case 4 :
+                        yellow();
+                        break;
+                }
+                printf("%c", elementInTheCase + 48);      // Joueur
+                resetColor();
+            } else if (elementInTheCase >= 10 ){
+                printf("%c", graphismesHD[3]);      // Bombe
             } else {
-                printf("%c", graphismesHD[sprite]);
+                printf("%c", graphismesHD[elementInTheCase]); // murs + boite + vide + powerup
             }
         }
         printf("\n");
