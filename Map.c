@@ -21,47 +21,48 @@ void printTab(int** tab, int r, int c){
     }
 }
 
-Map *createMap(int rows, int columns){
+Map *createMap(int nbLignes, int nbColonnes, int nbVies, int nbMaxPlayer, int nbBombeBase, float txLoot){
+
     Map *m = malloc(sizeof(Map));
     *m = (Map){
-            .tab = createTab(rows, columns),
-            .rows = rows,
-            .columns = columns,
+            .tab = createTab(nbLignes, nbColonnes),
+            .nbLignes = nbLignes,
+            .nbColonnes = nbColonnes,
+            .nbVies = nbVies,
+            .nbMaxPlayer = nbMaxPlayer,
+            .nbBombeBase = nbBombeBase,
+            .txLoot = txLoot
     };
-    return m;
-}
-
-Mur *createMur(Map *map){
-    Mur *m = malloc(sizeof(Mur));
-
-    *m = (Mur){
-            .x = rand() % map->rows,
-            .y = rand() % map->columns
-    };
-
-    return m;
-}
-
-void freeTab(int **tab, int r){
-    for (int i = 0; i < r; i++){
-        free(tab[i]);
+    for (int i = 0; i < nbMaxPlayer; ++i) {
+        m->joueurs[i] = createJoueur(nbVies, nbBombeBase, nbBombeBase, 2);
     }
-    free(tab);
+
+    return m;
 }
 
-bool isFree(Map *m, int x, int y){
-    return m->tab[x][y] == 0;
+bool isFree(Map *map, int x, int y){
+    return map->tab[x][y] == 0;
 }
 
-bool isAWall(Mur *mur, int x, int y){
-    return mur->x != x && mur->y != y;
+bool isAUnbreakeableWall(Map *map, int x, int y){
+    return map->tab[x][y] == 2;
 }
 
+bool isARegularWall(Map *map, int x, int y){
+    return map->tab[x][y] == 1;
+}
+
+bool isAWall(Map *map, int x, int y){
+    return isARegularWall(map, x, y) || isAUnbreakeableWall(map, x, y);
+}
+
+bool isAPlayer(Map *map, int x, int y){
+    return map->tab[x][y] >= 1000;
+}
 void freeMap(Map *m, int r){
     freeTab(m->tab, r);
     free(m);
 }
-
 
 void red(){
     printf("\033[1;31m");

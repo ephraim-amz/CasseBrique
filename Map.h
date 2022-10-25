@@ -1,7 +1,9 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <assert.h>
 #include "math.h"
+#include "Joueur.h"
 
 #ifndef CASSEBRIQUE_MAP_H
 #define CASSEBRIQUE_MAP_H
@@ -10,26 +12,26 @@
  * @brief Structure map
  */
 typedef struct {
-    int **tab;
-    int rows;
-    int columns;
+    int **tab; // Le tableau en 2d
+    int nbColonnes;
+    int nbLignes;
+    int nbVies;
+    int nbMaxPlayer;
+    Joueur *joueurs; // La liste des joueurs
+    int nbBombeBase;
+    float txLoot;
 } Map;
 
-/**
- * @brief Structure mur
- */
-typedef struct {
-    int x;
-    int y;
-} Mur;
 
-Map *createMap(int rows, int columns);
-
-Mur *createMur(Map *m);
+Map *createMap(int nbLignes, int nbColonnes, int nbVies, int nbMaxPlayer, int nbBombeBase, float txLoot);
 
 bool isFree(Map *m, int x, int y);
 
-bool isAWall(Mur *mur, int x, int y);
+bool isAWall(Map *map, int x, int y);
+
+bool isAUnbreakableWall(Map *map, int x, int y);
+
+bool isARegularWall(Map *map, int x, int y);
 
 int **createTab(int rows, int columns);
 
@@ -39,6 +41,19 @@ void freeMap(Map *map, int r);
 
 void printTab(int** tab, int r, int c);
 
+void red();
+
+void yellow();
+
+void green();
+
+void cyan();
+
+void blue();
+
+void purple();
+
+void resetColor();
 
 void displayMap(int r, int c, int map[r][c]);
 
