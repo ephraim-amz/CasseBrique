@@ -70,6 +70,8 @@ void bombDown(Joueur *j);
  */
 void print_winner(const Joueur *j);
 
+int checkInput(char input);
+int checkTheMooveAndMoove(int r, int c, int map[r][c], int actualPlayer, char move);
 
 
 #endif //CASSEBRIQUE_JOUEUR_H
