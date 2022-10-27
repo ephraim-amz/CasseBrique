@@ -92,11 +92,17 @@ void resetColor (){
 // 1 : mur destructible         ░ (code : 176)
 // 2 : mur infranchissable      █ (code : 219)
 // 3 -> 9 : powerups (à définir)
-// 10 -> 99 : bombes            ó (code : 162)
-// 100 : joueur 1               1 (code : 49)
-// 200 : joueur 2               2 (code : 50)
-// 300 : joueur 3               3 (code : 51)
-// 400 : joueur 4               4 (code : 52)
+// 110 -> 199 : bombes           ó (code : 162)
+// 1000 : joueur 1               1 (code : 49)
+// 2000 : joueur 2               2 (code : 50)
+// 3000 : joueur 3               3 (code : 51)
+// 4000 : joueur 4               4 (code : 52)
+// ex : joueur 2 vient de placer une bombe de puissance 3 qui explosera dans 8 tours de jeu
+// --> 2000 pour le joueur
+// --> 200 pour le joueur qui a placé la bombe
+// --> 30 pour la puissance de la bombe
+// --> 8 pour le timer
+// = 2238
 // Tout ce qui est entre 10 et 99 est une bombe
 // Le chiffre des dizaines représente la puissance de la bombe
 // Le chiffre des unités représente le compteur avant explosion
@@ -121,9 +127,9 @@ void displayMap(int r, int c, int map[r][c]){
             }
 
             // cases
-            if(elementInTheCase >= 100){
-                elementInTheCase /= 100;
-                switch (elementInTheCase) {
+            if(elementInTheCase >= 1000){
+                elementInTheCase /= 1000;
+                /*switch (elementInTheCase) {
                     case 1 :
                         red();
                         break;
@@ -136,9 +142,9 @@ void displayMap(int r, int c, int map[r][c]){
                     case 4 :
                         yellow();
                         break;
-                }
+                }*/
                 printf("%c", elementInTheCase + 48);      // Joueur
-                resetColor();
+                //resetColor();
             } else if (elementInTheCase >= 10 ){
                 printf("%c", graphismesHD[3]);      // Bombe
             } else {
