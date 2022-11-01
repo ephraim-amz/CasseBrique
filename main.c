@@ -4,6 +4,7 @@
 int main(int argc, char** argv) {
 ///////////////////////////////////////////////////////
     // MAP D'EXEMPLE
+    int row = 7, column = 7;
     int map1[][7] = {
             {2,2,2,2,2,2,2},
             {2,1000,0,1,0,3000,2},
@@ -86,7 +87,7 @@ int main(int argc, char** argv) {
             continue;
         }
 
-        moovePossible = checkTheMooveAndMoove(row, column, map, actualPlayer, input);
+        moovePossible = checkTheMooveAndMoove(row, column, map1, actualPlayer, input);
         if(moovePossible == 0) {
             continue;
         }
