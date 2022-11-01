@@ -40,6 +40,13 @@ Map *createMap(int nbLignes, int nbColonnes, int nbVies, int nbMaxPlayer, int nb
     return m;
 }
 
+void freeTab(int **tab, int r){
+    for (int i = 0; i < r; i++){
+        free(tab[i]);
+    }
+    free(tab);
+}
+
 bool isFree(Map *map, int x, int y){
     return map->tab[x][y] == 0;
 }

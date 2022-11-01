@@ -1,5 +1,4 @@
 #include "Map.h"
-#include "Joueur.h"
 
 int main(int argc, char** argv) {
 ///////////////////////////////////////////////////////
