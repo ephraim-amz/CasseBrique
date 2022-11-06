@@ -13,7 +13,8 @@ typedef struct {
     int nbBombesActuel;        //2
     int powerBombe;
     bool isAlive;
-    Bombe *bombes;
+    int numPlayer;
+    Bombe* bombes;
 } Joueur;
 
 /**
@@ -24,16 +25,16 @@ typedef struct {
  * @param powerBombe
  * @return
  */
-Joueur createJoueur(int nbVies, int nbBombesMax, int nbBombesActuel, int powerBombe);
+Joueur createJoueur(int nbVies, int nbBombesMax, int nbBombesActuel, int powerBombe, int numPlayer);
 
 /**
  * @brief Libérer un joueur créé en mémoire
  * @param j
  */
-void free_player(Joueur *j);
+void freePlayer(Joueur* j);
 
 
 int checkInput(char input);
-int checkTheMooveAndMoove(int r, int c, int map[r][c], int actualPlayer, char move);
+int checkTheMooveAndMoove(int r, int c, int** map, int actualPlayer, char move);
 
 #endif //CASSEBRIQUE_JOUEUR_H

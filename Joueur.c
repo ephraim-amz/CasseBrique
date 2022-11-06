@@ -1,7 +1,7 @@
 #include "Joueur.h"
 
-Joueur createJoueur(int nbVies, int nbBombesMax, int nbBombesActuel, int powerBombe){
-    Bombe *b = malloc(sizeof(Bombe));
+Joueur createJoueur(int nbVies, int nbBombesMax, int nbBombesActuel, int powerBombe, int numPlayer) {
+    Bombe* b = malloc(sizeof(Bombe) * nbBombesMax);
     for (int i = 0; i < nbBombesMax; ++i) {
         b[i] = createBombe(powerBombe);
     }
@@ -10,29 +10,30 @@ Joueur createJoueur(int nbVies, int nbBombesMax, int nbBombesActuel, int powerBo
             .nbBombesMax = nbBombesMax,
             .nbBombesActuel = nbBombesActuel,
             .powerBombe = powerBombe,
-            .bombes = b
+            .bombes = b,
+            .numPlayer = numPlayer
     };
 
     return j;
 }
 
 
-void free_player(Joueur *j){
+void freePlayer(Joueur* j) {
     freeBombe(j->bombes);
     free(j);
 }
 
 
 
-int checkInput(char input){
-    if(
+int checkInput(char input) {
+    if (
             input == 'u'
-            ||input == 'd'
-            ||input == 'l'
-            ||input == 'r'
-            ||input == 'x'
-            ||input == 'w'
-            ){
+            || input == 'd'
+            || input == 'l'
+            || input == 'r'
+            || input == 'x'
+            || input == 'w'
+            ) {
         return 1;
     }
     else {
@@ -41,23 +42,23 @@ int checkInput(char input){
 }
 
 
-int checkTheMooveAndMoove(int r, int c, int map[r][c], int actualPlayer, char move){
+int checkTheMooveAndMoove(int r, int c, int** map, int actualPlayer, char move) {
     // Find the position of the player
     int actualRow, actualColumn;
     int found = 0;
     actualPlayer *= 1000;
 
-    for(actualRow = 0; actualRow < r; ++actualRow){
-        for(actualColumn = 0; actualColumn < c; ++actualColumn){
-            if(
+    for (actualRow = 0; actualRow < r; ++actualRow) {
+        for (actualColumn = 0; actualColumn < c; ++actualColumn) {
+            if (
                     map[actualRow][actualColumn] >= actualPlayer
                     && map[actualRow][actualColumn] <= actualPlayer + 999
-                    ){
+                    ) {
                 found = 1;
                 break;
             }
         }
-        if (found){
+        if (found) {
             break;
         }
     }
@@ -67,31 +68,35 @@ int checkTheMooveAndMoove(int r, int c, int map[r][c], int actualPlayer, char mo
     //int
     switch (move) {
         case 'u':
-            if(actualRow == 0){
+            if (actualRow == 0) {
                 rowToCheck = r - 1;
-            } else {
+            }
+            else {
                 rowToCheck = actualRow - 1;
             }
             break;
         case 'd':
-            if(actualRow == r + 1){
+            if (actualRow == r + 1) {
                 rowToCheck = 0;
-            } else {
+            }
+            else {
                 rowToCheck = actualRow + 1;
             }
 
             break;
         case 'l':
-            if(actualColumn == 0){
+            if (actualColumn == 0) {
                 colToCheck = c - 1;
-            } else {
+            }
+            else {
                 colToCheck = actualColumn - 1;
             }
             break;
         case 'r':
-            if(actualColumn == c + 1){
+            if (actualColumn == c + 1) {
                 colToCheck = 0;
-            } else {
+            }
+            else {
                 colToCheck = actualColumn + 1;
             }
             break;
@@ -100,13 +105,13 @@ int checkTheMooveAndMoove(int r, int c, int map[r][c], int actualPlayer, char mo
             break;
         case 'w':
             return 1;
-        default :
+        default:
             return 0;
     }
 
     int destination = map[rowToCheck][colToCheck];
 
-    if(destination == 0 || (destination >= 3 && destination <= 9) ){
+    if (destination == 0 || (destination >= 3 && destination <= 9)) {
         map[actualRow][actualColumn] -= actualPlayer;
         map[rowToCheck][colToCheck] += actualPlayer;
         return 1;

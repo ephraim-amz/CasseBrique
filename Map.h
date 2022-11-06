@@ -12,32 +12,32 @@
  * @brief Structure map
  */
 typedef struct {
-    int **tab; // Le tableau en 2d
+    int** tab; // Le tableau en 2d
     int nbColonnes;
     int nbLignes;
     int nbVies;
     int nbMaxPlayer;
-    Joueur *joueurs; // La liste des joueurs
+    Joueur* joueurs; // La liste des joueurs
     int nbBombeBase;
     float txLoot;
 } Map;
 
 
-Map *createMap(int nbLignes, int nbColonnes, int nbVies, int nbMaxPlayer, int nbBombeBase, float txLoot);
+Map* createMap(int nbLignes, int nbColonnes, int nbVies, int nbMaxPlayer, int nbBombeBase, float txLoot);
 
-bool isFree(Map *m, int x, int y);
+bool isFree(Map* m, int x, int y);
 
-bool isAWall(Map *map, int x, int y);
+bool isAWall(Map* map, int x, int y);
 
-bool isAUnbreakableWall(Map *map, int x, int y);
+bool isAUnbreakableWall(Map* map, int x, int y);
 
-bool isARegularWall(Map *map, int x, int y);
+bool isARegularWall(Map* map, int x, int y);
 
-int **createTab(int rows, int columns);
+int** createTab(int rows, int columns);
 
-void freeTab(int **tab, int r);
+void freeTab(int** tab, int r);
 
-void freeMap(Map *map, int r);
+void freeMap(Map* map, int r);
 
 void printTab(int** tab, int r, int c);
 
@@ -51,10 +51,12 @@ void cyan();
 
 void blue();
 
+void black();
+
 void purple();
 
 void resetColor();
 
-void displayMap(int r, int c, int map[r][c]);
+void displayMap(int r, int c, int** map);
 
 #endif //CASSEBRIQUE_MAP_H

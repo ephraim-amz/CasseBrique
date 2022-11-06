@@ -1,7 +1,7 @@
 #include "Map.h"
 
-int **createTab(int rows, int columns){
-    int **tab = malloc(sizeof(int*) * rows);
+int** createTab(int rows, int columns) {
+    int** tab = malloc(sizeof(int*) * rows);
     for (int i = 0; i < columns; ++i) {
         tab[i] = calloc(columns, sizeof(int));
     }
@@ -9,21 +9,21 @@ int **createTab(int rows, int columns){
 }
 
 
-void printTab(int** tab, int r, int c){
-    for (int i = 0; i < r; i++){
+void printTab(int** tab, int r, int c) {
+    for (int i = 0; i < r; i++) {
         for (int j = 0; j < c; j++) {
             // tab[i][j] = ++count;
             printf("%d ", tab[i][j]);
-            if(j == r){
+            if (j == r) {
                 printf("\n");
             }
         }
     }
 }
 
-Map *createMap(int nbLignes, int nbColonnes, int nbVies, int nbMaxPlayer, int nbBombeBase, float txLoot){
+Map* createMap(int nbLignes, int nbColonnes, int nbVies, int nbMaxPlayer, int nbBombeBase, float txLoot) {
 
-    Map *m = malloc(sizeof(Map));
+    Map* m = malloc(sizeof(Map));
     *m = (Map){
             .tab = createTab(nbLignes, nbColonnes),
             .nbLignes = nbLignes,
@@ -34,62 +34,68 @@ Map *createMap(int nbLignes, int nbColonnes, int nbVies, int nbMaxPlayer, int nb
             .txLoot = txLoot
     };
     for (int i = 0; i < nbMaxPlayer; ++i) {
-        m->joueurs[i] = createJoueur(nbVies, nbBombeBase, nbBombeBase, 2);
+        m->joueurs[i] = createJoueur(nbVies, nbBombeBase, nbBombeBase, 2, i);
     }
 
     return m;
 }
 
-void freeTab(int **tab, int r){
-    for (int i = 0; i < r; i++){
+void freeTab(int** tab, int r) {
+    for (int i = 0; i < r; i++) {
         free(tab[i]);
     }
     free(tab);
 }
 
-bool isFree(Map *map, int x, int y){
+bool isFree(Map* map, int x, int y) {
     return map->tab[x][y] == 0;
 }
 
-bool isAUnbreakeableWall(Map *map, int x, int y){
+bool isAUnbreakeableWall(Map* map, int x, int y) {
     return map->tab[x][y] == 2;
 }
 
-bool isARegularWall(Map *map, int x, int y){
+bool isARegularWall(Map* map, int x, int y) {
     return map->tab[x][y] == 1;
 }
 
-bool isAWall(Map *map, int x, int y){
+bool isAWall(Map* map, int x, int y) {
     return isARegularWall(map, x, y) || isAUnbreakeableWall(map, x, y);
 }
 
-bool isAPlayer(Map *map, int x, int y){
+bool isAPlayer(Map* map, int x, int y) {
     return map->tab[x][y] >= 1000;
 }
-void freeMap(Map *m, int r){
+
+void freeMap(Map* m, int r) {
     freeTab(m->tab, r);
     free(m);
 }
 
-void red(){
+void red() {
     printf("\033[1;31m");
 }
-void yellow(){
+void yellow() {
     printf("\033[1;33m");
 }
-void green(){
+void green() {
     printf("\033[1;32m");
 }
-void cyan(){
+void cyan() {
     printf("\033[1;36m");
 }
-void blue(){
+void blue() {
     printf("\033[1;34m");
 }
-void purple(){
+
+void black(){
+    printf("\033[0;30m");
+}
+
+void purple() {
     printf("\033[1;35m");
 }
-void resetColor (){
+void resetColor() {
     printf("\033[0m");
 }
 
@@ -116,25 +122,26 @@ void resetColor (){
 // Quand le compteur passe à 0, la bombe explose
 // Après chaque mouvement, le compteur est décrémenté
 */
-void displayMap(int r, int c, int map[r][c]){
+void displayMap(int r, int c, int** map) {
     int i, j;
-    int graphismesHD[] = {255, 176, 219, 162};
+    int graphismesHD[] = { 255, 176, 219, 162 };
 
-    for(i = 0; i < r; ++i){
-        for (j = 0; j < c; ++j){
+    for (i = 0; i < r; ++i) {
+        for (j = 0; j < c; ++j) {
             int elementInTheCase = map[i][j];
 
             // espaces entre les cases
-            if (i == 0 || i == r-1){
-                if(j != c-1){
+            if (i == 0 || i == r - 1) {
+                if (j != c - 1) {
                     printf("%c", 219);
                 }
-            } else if(j > 0){
+            }
+            else if (j > 0) {
                 printf(" ");
             }
 
             // cases
-            if(elementInTheCase >= 1000){
+            if (elementInTheCase >= 1000) {
                 elementInTheCase /= 1000;
                 /*switch (elementInTheCase) {
                     case 1 :
@@ -152,9 +159,11 @@ void displayMap(int r, int c, int map[r][c]){
                 }*/
                 printf("%c", elementInTheCase + 48);      // Joueur
                 //resetColor();
-            } else if (elementInTheCase >= 10 ){
+            }
+            else if (elementInTheCase >= 10) {
                 printf("%c", graphismesHD[3]);      // Bombe
-            } else {
+            }
+            else {
                 printf("%c", graphismesHD[elementInTheCase]); // murs + boite + vide + powerup
             }
         }
