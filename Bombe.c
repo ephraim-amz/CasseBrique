@@ -8,6 +8,7 @@ Bombe createBombe(int portee){
     return b;
 }
 
+
 void freeBombe(Bombe *b){
     free(b);
 }

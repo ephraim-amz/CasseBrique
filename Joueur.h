@@ -33,8 +33,8 @@ Joueur createJoueur(int nbVies, int nbBombesMax, int nbBombesActuel, int powerBo
  */
 void freePlayer(Joueur* j);
 
-
 int checkInput(char input);
+
 int checkTheMooveAndMoove(int r, int c, int** map, int actualPlayer, char move);
 
 #endif //CASSEBRIQUE_JOUEUR_H

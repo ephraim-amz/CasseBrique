@@ -19,6 +19,7 @@ typedef struct {
  */
 Bombe createBombe(int portee);
 
+
 void freeBombe(Bombe *b);
 
 

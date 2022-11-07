@@ -37,7 +37,15 @@ int** createTab(int rows, int columns);
 
 void freeTab(int** tab, int r);
 
+FILE *loadFile(char *filename);
+
+Map *createMapViaFile(char *filename);
+
+int* getInfos(char* filename);
+
 void freeMap(Map* map, int r);
+
+void exploseBombe(Map *m, Bombe* b);
 
 void printTab(int** tab, int r, int c);
 

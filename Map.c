@@ -3,18 +3,22 @@
 int** createTab(int rows, int columns) {
     int** tab = malloc(sizeof(int*) * rows);
     for (int i = 0; i < columns; ++i) {
-        tab[i] = calloc(columns, sizeof(int));
+        tab[i] = malloc(sizeof(int) * columns);
+    }
+    for (int i = 0; i < rows; ++i) {
+        for (int j = 0; j < columns; ++j) {
+            tab[i][j] = 0;
+        }
     }
     return tab;
 }
-
 
 void printTab(int** tab, int r, int c) {
     for (int i = 0; i < r; i++) {
         for (int j = 0; j < c; j++) {
             // tab[i][j] = ++count;
             printf("%d ", tab[i][j]);
-            if (j == r) {
+            if (j == c-1) {
                 printf("\n");
             }
         }
@@ -38,6 +42,105 @@ Map* createMap(int nbLignes, int nbColonnes, int nbVies, int nbMaxPlayer, int nb
     }
 
     return m;
+}
+
+FILE *loadFile(char *filename) {
+    FILE *f = fopen(filename, "r");
+
+    if (f == NULL) {
+        printf("Le fichier n'a pas pu être chargé\n");
+        exit(-1);
+    } else {
+        printf("Le fichier a pu etre charge\n");
+        return f;
+    }
+}
+
+int* getInfos(char* filename){
+    FILE* mapFile = loadFile(filename);
+    char c = fgetc(mapFile);
+    int nbBombes = c - '0';
+    c = fgetc(mapFile);
+    c = fgetc(mapFile);
+    int nbColonnes = c - '0';
+    c = fgetc(mapFile);
+    c = fgetc(mapFile);
+    int nbLignes = c - '0';
+    int nbPlayers = 0;
+
+    while ((c = fgetc(mapFile)) != EOF){
+        if (c == 'p') {
+            nbPlayers++;
+        }
+    }
+    int* infos = malloc(sizeof(int) * 4);
+    infos[0] = nbBombes;
+    infos[1] = nbLignes;
+    infos[2] = nbColonnes;
+    infos[3] = nbPlayers;
+    fclose(mapFile);
+    return infos;
+}
+
+Map* createMapViaFile(char* filename){
+    FILE* mapFile = loadFile(filename);
+    int *infos = getInfos(filename);
+    int nbBombes = infos[0];
+    int nbLignes = infos[1];
+    int nbColonnes = infos[2];
+    int nbPlayers = infos[3];
+    Map* map = createMap(nbLignes, nbColonnes, 2, nbPlayers, nbBombes, 0.);
+    int col = 0;
+    int row = 0;
+    int player = 0;
+    char c2;
+    while ((c2 = fgetc(mapFile)) != EOF) {
+        col++;
+        if (c2 == '\n' || c2 == '\0') {
+            row++;
+            col = 0;
+        }
+        if (c2 == 'm') {
+            /*
+            int tempr = row-2;
+            int tempc = col-1;
+            printf("Mur destructible cree en %d %d\n", tempr, tempc);
+            // map[row][col] = 0;
+             */
+            map->tab[row-2][col-1] = 1;
+        }
+        if (c2 == 'x') {
+            /*
+            int tempr = row-2;
+            int tempc = col-1;
+            printf("Mur indestructible cree en %d %d\n", tempr, tempc);
+             */
+            map->tab[row-2][col-1] = 2;
+        }
+        if (c2 == 'p') {
+            /*
+            int tempr = row-2;
+            int tempc = col-1;
+            player += 1000;
+            printf("Joueur numéro %d cree en %d %d\n", player, tempr, tempc);
+             */
+            map->tab[row-2][col-1] = player;
+        }
+        if (c2 == ' ' && row >= 2) {
+            /*
+            int tempr = row-2;
+            int tempc = col-1;
+            printf("Espace libre cree en %d %d\n", tempr, tempc);
+             */
+            map->tab[row][col-1] = 0;
+        }
+
+    }
+
+    // printTab(map->tab, map->nbLignes, map->nbColonnes);
+    fclose(mapFile);
+    free(infos);
+    return map;
 }
 
 void freeTab(int** tab, int r) {
