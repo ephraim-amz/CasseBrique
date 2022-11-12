@@ -60,17 +60,22 @@ int main(int argc, char** argv) {
         // rajouter en paramètre de la fonction le numéro du joueur pour pouvoir afficher genre "Tour du joueur 1"
         // rajouter en paramètre de la fonction un int code erreur pour afficher genre "Coup invalide. Rejouer"
 
+
         // Affichage map
-        displayMap(7, 7, map1);
+        displayMap(row, column, map1);
 
         // Input
         if(!inputAllowed){
+            red();
             printf("Mouvement non reconnu. Rejouez.\n");
             inputAllowed = 1;
+            resetColor();
         }
         if(!moovePossible){
+            red();
             printf("Mouvement impossible. Rejouez.\n");
             moovePossible = 1;
+            resetColor();
         }
 
         // Ask Input
@@ -81,7 +86,7 @@ int main(int argc, char** argv) {
         // Verification de l'input
         inputAllowed = checkInput(input);
 
-        // Si input pas OK on revient au début de la boucle
+        // Si input pas OK ou moove impossible on revient au début de la boucle
         if(inputAllowed == 0) {
             continue;
         }

@@ -93,6 +93,36 @@ void resetColor (){
     printf("\033[0m");
 }
 
+void printRules(int x){
+    printf("%c%c%c%c||%c", 255,255,255,255,255);
+    switch (x) {
+        case 0:
+            printf("Controles :");
+            break;
+        case 1:
+            printf("'u' pour aller vers le haut");
+            break;
+        case 2:
+            printf("'d' pour aller vers le bas");
+            break;
+        case 3:
+            printf("'l' pour aller vers la gauche");
+            break;
+        case 4:
+            printf("'r' pour aller vers la droite");
+            break;
+        case 5:
+            printf("'x' pour poser une bombe");
+            break;
+        case 6:
+            printf("'w' pour passer son tour");
+            break;
+        default:
+            break;
+    }
+}
+
+
 /* Creation de plateaux de jeu
 // Légende :
 // 0 : vide                       (code : 255)
@@ -117,47 +147,64 @@ void resetColor (){
 // Après chaque mouvement, le compteur est décrémenté
 */
 void displayMap(int r, int c, int map[r][c]){
-    int i, j;
+    int i, j, ruleLine;
+
+    // Definition des caracteres à utiliser pour l'affichage
     int graphismesHD[] = {255, 176, 219, 162};
 
-    for(i = 0; i < r; ++i){
-        for (j = 0; j < c; ++j){
-            int elementInTheCase = map[i][j];
+    // Verification de la hauteur de la map pour le bon affichage des regles
+    ruleLine = r < 7 ? 7 : r;
 
-            // espaces entre les cases
-            if (i == 0 || i == r-1){
-                if(j != c-1){
-                    printf("%c", 219);
+    // Lecture de ligne
+    for(i = 0; i < ruleLine; ++i){
+        // Lecture de colonne
+        if(ruleLine <= r){
+            for (j = 0; j < c; ++j){
+                int elementInTheCase = map[i][j];
+
+                // espaces entre les cases
+                if (i == 0 || i == r-1){
+                    if(j != c-1){
+                        printf("%c", 219);
+                    }
+                } else if(j > 0){
+                    printf(" ");
                 }
-            } else if(j > 0){
-                printf(" ");
-            }
 
-            // cases
-            if(elementInTheCase >= 1000){
-                elementInTheCase /= 1000;
-                /*switch (elementInTheCase) {
-                    case 1 :
-                        red();
-                        break;
-                    case 2 :
-                        blue();
-                        break;
-                    case 3 :
-                        green();
-                        break;
-                    case 4 :
-                        yellow();
-                        break;
-                }*/
-                printf("%c", elementInTheCase + 48);      // Joueur
-                //resetColor();
-            } else if (elementInTheCase >= 10 ){
-                printf("%c", graphismesHD[3]);      // Bombe
-            } else {
-                printf("%c", graphismesHD[elementInTheCase]); // murs + boite + vide + powerup
+                // cases
+                if(elementInTheCase >= 1000){
+                    elementInTheCase /= 1000;
+
+                    // Apply colors to players
+                    switch (elementInTheCase) {
+                        case 1 :
+                            red();
+                            break;
+                        case 2 :
+                            blue();
+                            break;
+                        case 3 :
+                            green();
+                            break;
+                        case 4 :
+                            yellow();
+                            break;
+                    }
+                    printf("%c", elementInTheCase + 48);      // Joueur
+                    resetColor();
+                } else if (elementInTheCase >= 10 ){
+                    printf("%c", graphismesHD[3]);      // Bombe
+                } else {
+                    printf("%c", graphismesHD[elementInTheCase]); // murs + boite + vide + powerup
+                }
+            }
+        } else if(ruleLine <= 7) {
+            for (int k = 0; k < (c*2); ++k) {
+                printf("%c", 255);
             }
         }
+
+        printRules(i);
         printf("\n");
     }
 }
