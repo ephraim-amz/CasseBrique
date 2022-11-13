@@ -1,10 +1,12 @@
 #include "Map.h"
+#include "colors.h"
 
 int main(int argc, char** argv) {
 ///////////////////////////////////////////////////////
+    // TODO : sélectionner une map dans la pool et récupérer ses informations
+    // TODO créer la structure de la map à partir des information récupérées
     // MAP D'EXEMPLE
-    int row = 7, column = 7;
-    int map1[][7] = {
+    int map1[7][7] = {
             {2,2,2,2,2,2,2},
             {2,1000,0,1,0,3000,2},
             {2,0,2,1,2,0,2},
@@ -12,8 +14,20 @@ int main(int argc, char** argv) {
             {2,0,2,1,2,0,2},
             {2,4000,0,1,0,2000,2},
             {2,2,2,2,2,2,2}
-            };
-    //displayMap(7, 7, map1);
+    };
+
+    Map mapPlayed = {
+            .tab = (int **) map1,
+            .nbColonnes = 7,
+            .nbLignes = 7,
+
+            .nbMaxPlayer = 4,
+            .start_nbVies = 1,
+            .start_nbBombe = 1,
+            .start_powerBombe = 1,
+            .start_boots = 0
+    };
+    //displayMap(mapPlayed.nbLignes, mapPlayed.nbColonnes, mapPlayed.tab);
 
 /*
     // Nombre de joueurs à placer
@@ -34,35 +48,30 @@ int main(int argc, char** argv) {
 
     if(nmbBots < 0 || nmbBots > nmbPlayer){
         nmbBots = 0;
-    }
-*/
-
-    // TODO : sélectionner une map dans la pool et récupérer les informations de cette map dans un tableau
+    }*/
 
 
 
-
-    // TODO : créer les joueurs en fonction des paramètres de la map
-
-    
+    // Création des joueurs en fonction des paramètres de la map
+    Joueur* playerList = createJoueur(mapPlayed);
 
 
     // === BOUCLE DE JEU ===
-    int actualPlayer = 1;
-    int maxPlayer = 4;
-    int end = 0;
-    int inputAllowed = 1, moovePossible = 1;
+    int maxPlayer = mapPlayed.nbMaxPlayer;
+
+    int actualPlayer = 1, end = 0, inputAllowed = 1, moovePossible = 1;
     char input;
 
     while(end != 1){
-        // TODO : Fonction Affichage ATH
-        // Faut aller chercher dans la structure des joueurs leurs paramètres actuels.
-        // rajouter en paramètre de la fonction le numéro du joueur pour pouvoir afficher genre "Tour du joueur 1"
-        // rajouter en paramètre de la fonction un int code erreur pour afficher genre "Coup invalide. Rejouer"
+        // Affichage ATH
+        for (int i = 0; i < maxPlayer; ++i) {
+            displayATH(playerList[i], maxPlayer, actualPlayer);
+        }
 
 
         // Affichage map
-        displayMap(row, column, map1);
+        // TODO : correct the issue of map1 : can't pass the map from the struct
+        displayMap(mapPlayed.nbLignes, mapPlayed.nbColonnes, map1);
 
         // Input
         if(!inputAllowed){
@@ -91,7 +100,7 @@ int main(int argc, char** argv) {
             continue;
         }
 
-        moovePossible = checkTheMooveAndMoove(row, column, map1, actualPlayer, input);
+        moovePossible = checkTheMooveAndMoove(mapPlayed.nbLignes, mapPlayed.nbColonnes, map1, actualPlayer, input);
         if(moovePossible == 0) {
             continue;
         }
@@ -118,7 +127,8 @@ int main(int argc, char** argv) {
         } else {
             ++actualPlayer;
         }
-        //end =1;
+
+        end = verif_victoire(maxPlayer, playerList);
     }
 
     return 0;

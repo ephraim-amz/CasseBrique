@@ -1,27 +1,10 @@
 #include "Joueur.h"
+#include "Map.h"
+#include "colors.h"
 
-Joueur createJoueur(int nbVies, int nbBombesMax, int nbBombesActuel, int powerBombe){
-    Bombe *b = malloc(sizeof(Bombe));
-    for (int i = 0; i < nbBombesMax; ++i) {
-        b[i] = createBombe(powerBombe);
-    }
-    Joueur j = {
-            .nbVies = nbVies,
-            .nbBombesMax = nbBombesMax,
-            .nbBombesActuel = nbBombesActuel,
-            .powerBombe = powerBombe,
-            .bombes = b
-    };
-
-    return j;
-}
-
-
-void free_player(Joueur *j){
-    freeBombe(j->bombes);
+void free_player(Joueur* j){
     free(j);
 }
-
 
 
 int checkInput(char input){
@@ -74,12 +57,11 @@ int checkTheMooveAndMoove(int r, int c, int map[r][c], int actualPlayer, char mo
             }
             break;
         case 'd':
-            if(actualRow == r + 1){
+            if(actualRow == r - 1){
                 rowToCheck = 0;
             } else {
                 rowToCheck = actualRow + 1;
             }
-
             break;
         case 'l':
             if(actualColumn == 0){
@@ -89,7 +71,7 @@ int checkTheMooveAndMoove(int r, int c, int map[r][c], int actualPlayer, char mo
             }
             break;
         case 'r':
-            if(actualColumn == c + 1){
+            if(actualColumn == c - 1){
                 colToCheck = 0;
             } else {
                 colToCheck = actualColumn + 1;
@@ -112,5 +94,38 @@ int checkTheMooveAndMoove(int r, int c, int map[r][c], int actualPlayer, char mo
         return 1;
     }
 
+    return 0;
+}
+
+
+int verif_victoire(int maxPlayer, Joueur* playerList){
+    int players_alive = maxPlayer;
+    int winnerID = 0;
+
+
+    for (int i = 0; i < maxPlayer; i ++)
+    {
+        if(playerList[i].nbVies == 0)
+        {
+            players_alive -= 1;
+        }
+        else
+        {
+            winnerID = playerList[i].id;
+        }
+    }
+
+    if(players_alive == 1){
+        green();
+        printf("Le gagnant est J%d", winnerID);
+        resetColor();
+        return 1;
+    }
+    if(players_alive == 0){
+        red();
+        printf("Tout le monde est mort !!");
+        resetColor();
+        return 1;
+    }
     return 0;
 }

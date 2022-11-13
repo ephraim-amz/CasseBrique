@@ -1,39 +1,34 @@
 #include <stdlib.h>
-#include "Bombe.h"
+//#include "Map.h"
 
 #ifndef CASSEBRIQUE_JOUEUR_H
 #define CASSEBRIQUE_JOUEUR_H
+
 
 /**
  * @brief Structure joueur
  */
 typedef struct {
+    int id;
     int nbVies;
-    int nbBombesMax;        //2
-    int nbBombesActuel;        //2
+    int nbBombesMax;
+    int nbBombesActuel;
     int powerBombe;
-    bool isAlive;
-    Bombe *bombes;
+    int boots;
 } Joueur;
 
-/**
- * Créer un nouveau joueur avec les paramètres par défaut
- * @param nbVies
- * @param nbBombesMax
- * @param nbBombesActuel
- * @param powerBombe
- * @return
- */
-Joueur createJoueur(int nbVies, int nbBombesMax, int nbBombesActuel, int powerBombe);
 
-/**
- * @brief Libérer un joueur créé en mémoire
- * @param j
- */
+//Libérer un joueur créé en mémoire
 void free_player(Joueur *j);
 
 
+// Check if input is valable
 int checkInput(char input);
+
+// Check if the moove can be done and do it
 int checkTheMooveAndMoove(int r, int c, int map[r][c], int actualPlayer, char move);
+
+// Check end game conditions
+int verif_victoire(int maxPlayer, Joueur* playerList);
 
 #endif //CASSEBRIQUE_JOUEUR_H

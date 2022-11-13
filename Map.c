@@ -1,97 +1,29 @@
 #include "Map.h"
-
-int **createTab(int rows, int columns){
-    int **tab = malloc(sizeof(int*) * rows);
-    for (int i = 0; i < columns; ++i) {
-        tab[i] = calloc(columns, sizeof(int));
-    }
-    return tab;
-}
+#include "colors.h"
 
 
-void printTab(int** tab, int r, int c){
-    for (int i = 0; i < r; i++){
-        for (int j = 0; j < c; j++) {
-            // tab[i][j] = ++count;
-            printf("%d ", tab[i][j]);
-            if(j == r){
-                printf("\n");
-            }
-        }
-    }
-}
+// Fonction problématique dans Joueur.c
+Joueur* createJoueur(Map mapPlayed){
+    int maxPlayer = mapPlayed.nbMaxPlayer;
+    Joueur* playerList = malloc(maxPlayer * sizeof(Joueur));
 
-Map *createMap(int nbLignes, int nbColonnes, int nbVies, int nbMaxPlayer, int nbBombeBase, float txLoot){
-
-    Map *m = malloc(sizeof(Map));
-    *m = (Map){
-            .tab = createTab(nbLignes, nbColonnes),
-            .nbLignes = nbLignes,
-            .nbColonnes = nbColonnes,
-            .nbVies = nbVies,
-            .nbMaxPlayer = nbMaxPlayer,
-            .nbBombeBase = nbBombeBase,
-            .txLoot = txLoot
-    };
-    for (int i = 0; i < nbMaxPlayer; ++i) {
-        m->joueurs[i] = createJoueur(nbVies, nbBombeBase, nbBombeBase, 2);
+    for (int i = 0; i < maxPlayer; ++i) {
+        playerList[i].id = i+1;
+        playerList[i].nbVies = mapPlayed.start_nbVies;
+        playerList[i].nbBombesMax = mapPlayed.start_nbBombe;
+        playerList[i].nbBombesActuel = mapPlayed.start_nbBombe;
+        playerList[i].powerBombe = mapPlayed.start_powerBombe;
+        playerList[i].boots = mapPlayed.start_boots;
     }
 
-    return m;
+    return playerList;
 }
-
-void freeTab(int **tab, int r){
-    for (int i = 0; i < r; i++){
-        free(tab[i]);
-    }
-    free(tab);
-}
-
-bool isFree(Map *map, int x, int y){
-    return map->tab[x][y] == 0;
-}
-
-bool isAUnbreakeableWall(Map *map, int x, int y){
-    return map->tab[x][y] == 2;
-}
-
-bool isARegularWall(Map *map, int x, int y){
-    return map->tab[x][y] == 1;
-}
-
-bool isAWall(Map *map, int x, int y){
-    return isARegularWall(map, x, y) || isAUnbreakeableWall(map, x, y);
-}
-
-bool isAPlayer(Map *map, int x, int y){
-    return map->tab[x][y] >= 1000;
-}
+/*
 void freeMap(Map *m, int r){
     freeTab(m->tab, r);
     free(m);
 }
-
-void red(){
-    printf("\033[1;31m");
-}
-void yellow(){
-    printf("\033[1;33m");
-}
-void green(){
-    printf("\033[1;32m");
-}
-void cyan(){
-    printf("\033[1;36m");
-}
-void blue(){
-    printf("\033[1;34m");
-}
-void purple(){
-    printf("\033[1;35m");
-}
-void resetColor (){
-    printf("\033[0m");
-}
+*/
 
 void printRules(int x){
     printf("%c%c%c%c||%c", 255,255,255,255,255);
@@ -158,7 +90,7 @@ void displayMap(int r, int c, int map[r][c]){
     // Lecture de ligne
     for(i = 0; i < ruleLine; ++i){
         // Lecture de colonne
-        if(ruleLine <= r){
+        if(i <= r){
             for (j = 0; j < c; ++j){
                 int elementInTheCase = map[i][j];
 
@@ -176,7 +108,7 @@ void displayMap(int r, int c, int map[r][c]){
                     elementInTheCase /= 1000;
 
                     // Apply colors to players
-                    switch (elementInTheCase) {
+                    /*switch (elementInTheCase) {
                         case 1 :
                             red();
                             break;
@@ -189,9 +121,9 @@ void displayMap(int r, int c, int map[r][c]){
                         case 4 :
                             yellow();
                             break;
-                    }
+                    }*/
                     printf("%c", elementInTheCase + 48);      // Joueur
-                    resetColor();
+                    //resetColor();
                 } else if (elementInTheCase >= 10 ){
                     printf("%c", graphismesHD[3]);      // Bombe
                 } else {
@@ -199,7 +131,7 @@ void displayMap(int r, int c, int map[r][c]){
                 }
             }
         } else if(ruleLine <= 7) {
-            for (int k = 0; k < (c*2); ++k) {
+            for (int k = 0; k < (c*2)-1; ++k) {
                 printf("%c", 255);
             }
         }
@@ -207,4 +139,41 @@ void displayMap(int r, int c, int map[r][c]){
         printRules(i);
         printf("\n");
     }
+}
+
+
+void displayATH(Joueur player, int totalPlayer, int actualPlayer) {
+    switch (player.id) {
+        case 1:
+            red();
+            break;
+        case 2:
+            yellow();
+            break;
+        case 3:
+            green();
+            break;
+        case 4:
+            cyan();
+            break;
+    }
+
+    if(player.nbVies == 0)
+    {
+        black();
+        printf(":dead:%c", 255);
+    }
+
+    else if(actualPlayer == player.id)
+    {
+        printf("->%c%c", 255,255);
+    }
+
+    else
+    {
+        printf("%c%c%c%c", 255,255,255,255);
+    }
+
+    printf("J%d, x%d %c | x%d %c | x%d POWA\n", player.id, player.nbVies, 3, player.nbBombesActuel, 162, player.powerBombe);
+    resetColor();
 }

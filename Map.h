@@ -12,48 +12,32 @@
  * @brief Structure map
  */
 typedef struct {
-    int **tab; // Le tableau en 2d
-    int nbColonnes;
+    // Infos de la map
+    int* tab; // Le tableau en 2d
     int nbLignes;
-    int nbVies;
+    int nbColonnes;
+    float taux_loot;
+
+    // Infos pour initialiser les joueurs
     int nbMaxPlayer;
-    Joueur *joueurs; // La liste des joueurs
-    int nbBombeBase;
-    float txLoot;
+    int start_nbVies;
+    int start_nbBombe;
+    int start_powerBombe;
+    int start_boots;
 } Map;
 
 
 Map *createMap(int nbLignes, int nbColonnes, int nbVies, int nbMaxPlayer, int nbBombeBase, float txLoot);
 
-bool isFree(Map *m, int x, int y);
-
-bool isAWall(Map *map, int x, int y);
-
-bool isAUnbreakableWall(Map *map, int x, int y);
-
-bool isARegularWall(Map *map, int x, int y);
-
-int **createTab(int rows, int columns);
-
-void freeTab(int **tab, int r);
+// Fonction problématique dans Joueur.c
+// Créer un nouveau joueur avec les paramètres par défaut de la map
+Joueur* createJoueur(Map mapPlayed);
 
 void freeMap(Map *map, int r);
 
-void printTab(int** tab, int r, int c);
+void displayATH(Joueur player, int totalPlayer, int actualPlayer);
 
-void red();
-
-void yellow();
-
-void green();
-
-void cyan();
-
-void blue();
-
-void purple();
-
-void resetColor();
+void printRules(int x);
 
 void displayMap(int r, int c, int map[r][c]);
 
