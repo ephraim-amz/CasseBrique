@@ -63,65 +63,69 @@ int main(int argc, char** argv) {
     char input;
 
     while(end != 1){
-        // Affichage ATH
-        for (int i = 0; i < maxPlayer; ++i) {
-            displayATH(playerList[i], maxPlayer, actualPlayer);
+        // Vérification si le joueur peut jouer
+        if(playerList[actualPlayer].nbVies > 0)
+        {
+            // Affichage ATH
+            for (int i = 0; i < maxPlayer; ++i) {
+                displayATH(playerList[i], maxPlayer, actualPlayer);
+            }
+
+            // Affichage map
+            // TODO : correct the issue of map1 : can't pass the map from the struct
+            displayMap(mapPlayed.nbLignes, mapPlayed.nbColonnes, map1);
+
+            // Input
+            if(!inputAllowed){
+                red();
+                printf("Mouvement non reconnu. Rejouez.\n");
+                inputAllowed = 1;
+                resetColor();
+            }
+            if(!moovePossible){
+                red();
+                printf("Action impossible. Rejouez.\n");
+                moovePossible = 1;
+                resetColor();
+            }
+
+            // Ask Input
+            printf("Tour du Joueur %d \nAction a effectuer :", actualPlayer);
+            scanf("%c", &input);
+            fflush(stdin);
+
+            // Verification de l'input
+            inputAllowed = checkInput(input);
+
+            // Si input pas OK ou moove impossible on revient au début de la boucle
+            if(inputAllowed == 0) {
+                continue;
+            }
+
+            moovePossible = checkTheMooveAndMoove(mapPlayed.nbLignes, mapPlayed.nbColonnes, map1, actualPlayer, input);
+            if(moovePossible == 0) {
+                continue;
+            }
+
+            // TODO : Màj de la map
+
+
+
+            // TODO : Tik des bombes
+
+
+
+            // TODO : explosion des bombes (peut être mettre ça dans la fonction de tik des bombes)
+
+
+
+            // TODO : Màj de la map
+
+
         }
 
 
-        // Affichage map
-        // TODO : correct the issue of map1 : can't pass the map from the struct
-        displayMap(mapPlayed.nbLignes, mapPlayed.nbColonnes, map1);
-
-        // Input
-        if(!inputAllowed){
-            red();
-            printf("Mouvement non reconnu. Rejouez.\n");
-            inputAllowed = 1;
-            resetColor();
-        }
-        if(!moovePossible){
-            red();
-            printf("Mouvement impossible. Rejouez.\n");
-            moovePossible = 1;
-            resetColor();
-        }
-
-        // Ask Input
-        printf("Tour du Joueur %d \nAction a effectuer :", actualPlayer);
-        scanf("%c", &input);
-        fflush(stdin);
-
-        // Verification de l'input
-        inputAllowed = checkInput(input);
-
-        // Si input pas OK ou moove impossible on revient au début de la boucle
-        if(inputAllowed == 0) {
-            continue;
-        }
-
-        moovePossible = checkTheMooveAndMoove(mapPlayed.nbLignes, mapPlayed.nbColonnes, map1, actualPlayer, input);
-        if(moovePossible == 0) {
-            continue;
-        }
-
-        // TODO : Màj de la map
-
-
-
-        // TODO : Tik des bombes
-
-
-
-        // TODO : explosion des bombes (peut être mettre ça dans la fonction de tik des bombes)
-
-
-
-        // TODO : Màj de la map
-
-
-
-        // TODO : changement du joueur
+        // Changement du joueur
         if(actualPlayer == maxPlayer) {
             actualPlayer = 1;
         } else {
