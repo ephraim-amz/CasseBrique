@@ -24,17 +24,17 @@ int checkInput(char input){
 }
 
 
-int checkTheMooveAndMoove(int r, int c, int map[r][c], int actualPlayer, char move){
-    // Find the position of the player
+int checkTheMooveAndMoove(int r, int c, int map[r][c], int actualPlayer, char move, int gotBoots){
     int actualRow, actualColumn;
     int found = 0;
-    actualPlayer *= 1000;
+    actualPlayer *= 10000;
 
+    // Find the position of the player
     for(actualRow = 0; actualRow < r; ++actualRow){
         for(actualColumn = 0; actualColumn < c; ++actualColumn){
             if(
                     map[actualRow][actualColumn] >= actualPlayer
-                    && map[actualRow][actualColumn] <= actualPlayer + 999
+                    && map[actualRow][actualColumn] <= actualPlayer + 9999
                     ){
                 found = 1;
                 break;
@@ -47,7 +47,7 @@ int checkTheMooveAndMoove(int r, int c, int map[r][c], int actualPlayer, char mo
 
 
     int rowToCheck = actualRow, colToCheck = actualColumn;
-    //int
+    // En fonction du mouvement souhaite : trouver les coordonnees de la case d'arrivee
     switch (move) {
         case 'u':
             if(actualRow == 0){
@@ -86,11 +86,19 @@ int checkTheMooveAndMoove(int r, int c, int map[r][c], int actualPlayer, char mo
             return 0;
     }
 
+    // Verification de ce qu'il y a dans la case d'arivee : si upgrade ou case vide -> deplacement OK
     int destination = map[rowToCheck][colToCheck];
 
     if(destination == 0 || (destination >= 3 && destination <= 9) ){
         map[actualRow][actualColumn] -= actualPlayer;
         map[rowToCheck][colToCheck] += actualPlayer;
+        return 1;
+    }
+    // Si bombe mais que le joueur a des boots --> deplacement OK
+    else if(gotBoots && (destination >= 100 && destination <= 999)){
+
+        // TODO : calculer la case d'arrivée de la bombe et l'y déplacer
+
         return 1;
     }
 
@@ -103,14 +111,10 @@ int verif_victoire(int maxPlayer, Joueur* playerList){
     int winnerID = 0;
 
 
-    for (int i = 0; i < maxPlayer; i ++)
-    {
-        if(playerList[i].nbVies == 0)
-        {
+    for (int i = 0; i < maxPlayer; i ++){
+        if(playerList[i].nbVies == 0){
             players_alive -= 1;
-        }
-        else
-        {
+        } else {
             winnerID = playerList[i].id;
         }
     }

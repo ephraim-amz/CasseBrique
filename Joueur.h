@@ -26,7 +26,7 @@ void free_player(Joueur *j);
 int checkInput(char input);
 
 // Check if the moove can be done and do it
-int checkTheMooveAndMoove(int r, int c, int map[r][c], int actualPlayer, char move);
+int checkTheMooveAndMoove(int r, int c, int map[r][c], int actualPlayer, char move, int gotBoots);
 
 // Check end game conditions
 int verif_victoire(int maxPlayer, Joueur* playerList);

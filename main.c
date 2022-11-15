@@ -8,11 +8,11 @@ int main(int argc, char** argv) {
     // MAP D'EXEMPLE
     int map1[7][7] = {
             {2,2,2,2,2,2,2},
-            {2,1000,0,1,0,3000,2},
+            {2,10000,0,1,0,30000,2},
             {2,0,2,1,2,0,2},
             {2,1,1,1,1,1,2},
             {2,0,2,1,2,0,2},
-            {2,4000,0,1,0,2000,2},
+            {2,40000,0,1,0,20000,2},
             {2,2,2,2,2,2,2}
     };
 
@@ -25,6 +25,7 @@ int main(int argc, char** argv) {
             .start_nbVies = 1,
             .start_nbBombe = 1,
             .start_powerBombe = 1,
+            .bombe_compteur = 20,
             .start_boots = 0
     };
     //displayMap(mapPlayed.nbLignes, mapPlayed.nbColonnes, mapPlayed.tab);
@@ -102,7 +103,7 @@ int main(int argc, char** argv) {
                 continue;
             }
 
-            moovePossible = checkTheMooveAndMoove(mapPlayed.nbLignes, mapPlayed.nbColonnes, map1, actualPlayer, input);
+            moovePossible = checkTheMooveAndMoove(mapPlayed.nbLignes, mapPlayed.nbColonnes, map1, actualPlayer, input, playerList[actualPlayer].boots);
             if(moovePossible == 0) {
                 continue;
             }

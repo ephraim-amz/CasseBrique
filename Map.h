@@ -23,6 +23,7 @@ typedef struct {
     int start_nbVies;
     int start_nbBombe;
     int start_powerBombe;
+    int bombe_compteur;
     int start_boots;
 } Map;
 

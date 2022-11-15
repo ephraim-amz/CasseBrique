@@ -104,8 +104,8 @@ void displayMap(int r, int c, int map[r][c]){
                 }
 
                 // cases
-                if(elementInTheCase >= 1000){
-                    elementInTheCase /= 1000;
+                if(elementInTheCase >= 10000){
+                    elementInTheCase /= 10000;
 
                     // Apply colors to players
                     /*switch (elementInTheCase) {
@@ -176,4 +176,5 @@ void displayATH(Joueur player, int totalPlayer, int actualPlayer) {
 
     printf("J%d, x%d %c | x%d %c | x%d POWA\n", player.id, player.nbVies, 3, player.nbBombesActuel, 162, player.powerBombe);
     resetColor();
+    printf("\n");
 }
