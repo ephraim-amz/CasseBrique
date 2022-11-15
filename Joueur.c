@@ -1,7 +1,8 @@
 #include "Joueur.h"
+#include "Map.h"
 
 Joueur createJoueur(int nbVies, int nbBombesMax, int nbBombesActuel, int powerBombe, int numPlayer) {
-    Bombe* b = malloc(sizeof(Bombe) * nbBombesMax);
+    Bombe *b = malloc(sizeof(Bombe) * nbBombesMax);
     for (int i = 0; i < nbBombesMax; ++i) {
         b[i] = createBombe(powerBombe);
     }
@@ -17,14 +18,6 @@ Joueur createJoueur(int nbVies, int nbBombesMax, int nbBombesActuel, int powerBo
     return j;
 }
 
-
-void freePlayer(Joueur* j) {
-    freeBombe(j->bombes);
-    free(j);
-}
-
-
-
 int checkInput(char input) {
     if (
             input == 'u'
@@ -35,87 +28,13 @@ int checkInput(char input) {
             || input == 'w'
             ) {
         return 1;
-    }
-    else {
+    } else {
         return 0;
     }
 }
 
 
-int checkTheMooveAndMoove(int r, int c, int** map, int actualPlayer, char move) {
-    // Find the position of the player
-    int actualRow, actualColumn;
-    int found = 0;
-    actualPlayer *= 1000;
-
-    for (actualRow = 0; actualRow < r; ++actualRow) {
-        for (actualColumn = 0; actualColumn < c; ++actualColumn) {
-            if (
-                    map[actualRow][actualColumn] >= actualPlayer
-                    && map[actualRow][actualColumn] <= actualPlayer + 999
-                    ) {
-                found = 1;
-                break;
-            }
-        }
-        if (found) {
-            break;
-        }
-    }
-
-
-    int rowToCheck = actualRow, colToCheck = actualColumn;
-    //int
-    switch (move) {
-        case 'u':
-            if (actualRow == 0) {
-                rowToCheck = r - 1;
-            }
-            else {
-                rowToCheck = actualRow - 1;
-            }
-            break;
-        case 'd':
-            if (actualRow == r + 1) {
-                rowToCheck = 0;
-            }
-            else {
-                rowToCheck = actualRow + 1;
-            }
-
-            break;
-        case 'l':
-            if (actualColumn == 0) {
-                colToCheck = c - 1;
-            }
-            else {
-                colToCheck = actualColumn - 1;
-            }
-            break;
-        case 'r':
-            if (actualColumn == c + 1) {
-                colToCheck = 0;
-            }
-            else {
-                colToCheck = actualColumn + 1;
-            }
-            break;
-        case 'x':
-            // TODO
-            break;
-        case 'w':
-            return 1;
-        default:
-            return 0;
-    }
-
-    int destination = map[rowToCheck][colToCheck];
-
-    if (destination == 0 || (destination >= 3 && destination <= 9)) {
-        map[actualRow][actualColumn] -= actualPlayer;
-        map[rowToCheck][colToCheck] += actualPlayer;
-        return 1;
-    }
-
-    return 0;
+void freePlayer(Joueur *j) {
+    freeBombe(j->bombes);
+    free(j);
 }

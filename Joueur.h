@@ -1,8 +1,8 @@
-#include <stdlib.h>
-#include "Bombe.h"
-
 #ifndef CASSEBRIQUE_JOUEUR_H
 #define CASSEBRIQUE_JOUEUR_H
+
+#include "Bombe.h"
+
 
 /**
  * @brief Structure joueur
@@ -34,7 +34,5 @@ Joueur createJoueur(int nbVies, int nbBombesMax, int nbBombesActuel, int powerBo
 void freePlayer(Joueur* j);
 
 int checkInput(char input);
-
-int checkTheMooveAndMoove(int r, int c, int** map, int actualPlayer, char move);
 
 #endif //CASSEBRIQUE_JOUEUR_H

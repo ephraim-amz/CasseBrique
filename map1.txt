@@ -1,7 +1,9 @@
-█████████████
-█ P ó ░   P █
-█   █ ░ █ ó █
-█ ░ ░ ░ ░ ░ █
-█ ó █ ░ █   █
-█ P   ░ ó P █
-█████████████
+1
+13 7
+xxxxxxxxxxxxx
+x p   m   p x
+x   x m x   x
+x m m m m m x
+x   x m x   x
+x p   m   p x
+xxxxxxxxxxxxx

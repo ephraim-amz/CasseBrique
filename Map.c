@@ -1,4 +1,5 @@
 #include "Map.h"
+#include "Decrementation.h"
 
 int** createTab(int rows, int columns) {
     int** tab = malloc(sizeof(int*) * rows);
@@ -37,6 +38,7 @@ Map* createMap(int nbLignes, int nbColonnes, int nbVies, int nbMaxPlayer, int nb
             .nbBombeBase = nbBombeBase,
             .txLoot = txLoot
     };
+    m->joueurs = malloc(sizeof(Joueur) * nbMaxPlayer);
     for (int i = 0; i < nbMaxPlayer; ++i) {
         m->joueurs[i] = createJoueur(nbVies, nbBombeBase, nbBombeBase, 2, i);
     }
@@ -48,10 +50,10 @@ FILE *loadFile(char *filename) {
     FILE *f = fopen(filename, "r");
 
     if (f == NULL) {
-        printf("Le fichier n'a pas pu être chargé\n");
+        //printf("Le fichier n'a pas pu être chargé\n");
         exit(-1);
     } else {
-        printf("Le fichier a pu etre charge\n");
+        //printf("Le fichier a pu etre charge\n");
         return f;
     }
 }
@@ -118,12 +120,12 @@ Map* createMapViaFile(char* filename){
             map->tab[row-2][col-1] = 2;
         }
         if (c2 == 'p') {
-            /*
+
             int tempr = row-2;
             int tempc = col-1;
             player += 1000;
-            printf("Joueur numéro %d cree en %d %d\n", player, tempr, tempc);
-             */
+            //printf("Joueur numéro %d cree en %d %d\n", player, tempr, tempc);
+
             map->tab[row-2][col-1] = player;
         }
         if (c2 == ' ' && row >= 2) {
@@ -150,20 +152,20 @@ void freeTab(int** tab, int r) {
     free(tab);
 }
 
-bool isFree(Map* map, int x, int y) {
-    return map->tab[x][y] == 0;
+bool isFree(Map* m, int row, int column) {
+    return m->tab[row][column] == 0;
 }
 
 bool isAUnbreakeableWall(Map* map, int x, int y) {
     return map->tab[x][y] == 2;
 }
 
-bool isARegularWall(Map* map, int x, int y) {
-    return map->tab[x][y] == 1;
+bool isARegularWall(Map* map, int row, int column) {
+    return map->tab[row][column] == 1;
 }
 
-bool isAWall(Map* map, int x, int y) {
-    return isARegularWall(map, x, y) || isAUnbreakeableWall(map, x, y);
+bool isAWall(Map* map, int row, int column) {
+    return isARegularWall(map, row, column) || isAUnbreakeableWall(map, row, column);
 }
 
 bool isAPlayer(Map* map, int x, int y) {
@@ -272,4 +274,114 @@ void displayMap(int r, int c, int** map) {
         }
         printf("\n");
     }
+}
+
+bool verifVictoire(Map* m) {
+    int players_alive = m->nbMaxPlayer;
+    /// nbr de joueurs en vies
+    for (int i = 0; i < m->nbMaxPlayer; i++)
+    {
+        if (m->joueurs[i].nbVies == 0)
+        {
+            players_alive -= 1;
+            freePlayer(&m->joueurs[i]);
+        }
+    }
+
+    if (players_alive == 1) {
+
+        for (int i = 0; i < m->nbMaxPlayer; i++) {
+
+            if (m->joueurs[i].nbVies >= 1)
+            {
+                green();
+                printf("Le gagnant est J%d", m->joueurs[i].numPlayer);
+                resetColor();
+            }
+        }
+    }
+    if (players_alive == 0) {
+        red();
+        printf("Tout le monde est mort !!");
+        resetColor();
+    }
+    return 0;
+}
+
+
+bool checkTheMooveAndMoove(int r, int c, Map *map, int actualPlayer, char move) {
+    // Find the position of the player
+    int actualRow, actualColumn;
+    int found = 0;
+    actualPlayer *= 1000;
+
+    for (actualRow = 0; actualRow < r; ++actualRow) {
+        for (actualColumn = 0; actualColumn < c; ++actualColumn) {
+            if (
+                    map->tab[actualRow][actualColumn] >= actualPlayer
+                    && map->tab[actualRow][actualColumn] <= actualPlayer + 999
+                    ) {
+                found = 1;
+                break;
+            }
+        }
+        if (found) {
+            break;
+        }
+    }
+
+
+    int rowToCheck = actualRow, colToCheck = actualColumn;
+    //int
+    switch (move) {
+        case 'u':
+            if (actualRow == 0) {
+                if (isFree(map, r-1, colToCheck)){
+                    rowToCheck = r - 1;
+                }
+            } else {
+                rowToCheck = actualRow - 1;
+            }
+
+            break;
+        case 'd':
+            if (actualRow == r + 1) {
+                rowToCheck = 0;
+            } else {
+                rowToCheck = actualRow + 1;
+            }
+
+            break;
+        case 'l':
+            if (actualColumn == 0) {
+                colToCheck = c - 1;
+            } else {
+                colToCheck = actualColumn - 1;
+            }
+            break;
+        case 'r':
+            if (actualColumn == c + 1) {
+                colToCheck = 0;
+            } else {
+                colToCheck = actualColumn + 1;
+            }
+            break;
+        case 'x':
+            decrementationMap(map);
+            break;
+        case 'w':
+            return 1;
+        default:
+            return 0;
+    }
+
+    int destination = map->tab[rowToCheck][colToCheck];
+
+    if (destination == 0 || (destination >= 3 && destination <= 9)) {
+        map->tab[actualRow][actualColumn] -= actualPlayer;
+        map->tab[rowToCheck][colToCheck] += actualPlayer;
+        return 1;
+    }
+
+    return 0;
 }

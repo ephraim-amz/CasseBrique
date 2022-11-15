@@ -39,7 +39,7 @@ int verif_victoire(int nbr_players, Joueur* joueur_array) {
 
 //////////////////////////////////////////
 //////////////////////////////////////////
-
+/*
 int main()
 {
     //////////////////////////////////////////
@@ -112,6 +112,7 @@ int main()
 
 
     }
-    verif_victoire(nbr_players, joueur_array);
+    verifVictoire(nbr_players, joueur_array);
     return 0;
 }
+ */

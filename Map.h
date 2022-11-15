@@ -2,11 +2,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
-#include "math.h"
+#include <math.h>
 #include "Joueur.h"
+
 
 #ifndef CASSEBRIQUE_MAP_H
 #define CASSEBRIQUE_MAP_H
+
 
 /**
  * @brief Structure map
@@ -25,13 +27,17 @@ typedef struct {
 
 Map* createMap(int nbLignes, int nbColonnes, int nbVies, int nbMaxPlayer, int nbBombeBase, float txLoot);
 
-bool isFree(Map* m, int x, int y);
+bool checkTheMooveAndMoove(int r, int c, Map *map, int actualPlayer, char move);
 
-bool isAWall(Map* map, int x, int y);
+bool isFree(Map* m, int row, int column);
 
-bool isAUnbreakableWall(Map* map, int x, int y);
+bool isAWall(Map* map, int row, int column);
 
-bool isARegularWall(Map* map, int x, int y);
+bool isAUnbreakableWall(Map* map, int row, int column);
+
+bool verifVictoire(Map* m);
+
+bool isARegularWall(Map* map, int row, int column);
 
 int** createTab(int rows, int columns);
 

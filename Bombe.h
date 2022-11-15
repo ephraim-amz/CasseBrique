@@ -1,8 +1,7 @@
-#include "stdlib.h"
-#include "stdbool.h"
-
 #ifndef CASSEBRIQUE_BOMBE_H
 #define CASSEBRIQUE_BOMBE_H
+#include "stdlib.h"
+#include "stdbool.h"
 
 
 /**
