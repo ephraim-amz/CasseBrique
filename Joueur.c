@@ -24,7 +24,7 @@ int checkInput(char input){
 }
 
 
-int checkTheMooveAndMoove(int r, int c, int map[r][c], int actualPlayer, char move, int gotBoots){
+int checkTheMooveAndMoove(int r, int c, int map[r][c], int actualPlayer, char move, int gotBoots, Joueur joueur, int timer){
     int actualRow, actualColumn;
     int found = 0;
     actualPlayer *= 10000;
@@ -79,6 +79,18 @@ int checkTheMooveAndMoove(int r, int c, int map[r][c], int actualPlayer, char mo
             break;
         case 'x':
             // TODO
+            // Verifier s'il n'y a pas déjà une bombe sur la case
+            if(map[actualRow][actualColumn] % 10000 > 0 || joueur.nbBombesActuel == joueur.nbBombesMax)
+            {
+                return 0;
+            }
+            else
+            {
+                int newBomb = joueur.id * 1000 + joueur.powerBombe * 100 + timer;
+                map[actualRow][actualColumn] = newBomb;
+                ++joueur.nbBombesActuel;
+                return 1;
+            }
             break;
         case 'w':
             return 1;

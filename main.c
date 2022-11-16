@@ -103,7 +103,7 @@ int main(int argc, char** argv) {
                 continue;
             }
 
-            moovePossible = checkTheMooveAndMoove(mapPlayed.nbLignes, mapPlayed.nbColonnes, map1, actualPlayer, input, playerList[actualPlayer].boots);
+            moovePossible = checkTheMooveAndMoove(mapPlayed.nbLignes, mapPlayed.nbColonnes, map1, actualPlayer, input, playerList[actualPlayer].boots, playerList[actualPlayer - 1], mapPlayed.bombe_compteur);
             if(moovePossible == 0) {
                 continue;
             }
