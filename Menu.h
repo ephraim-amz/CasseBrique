@@ -8,7 +8,7 @@ void accueil();
 
 void choixPossible();
 
-void choixUtilisateur();
+int choixUtilisateur();
 
 void game(Map* m);
 

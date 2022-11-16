@@ -2,12 +2,13 @@
 #include "Menu.h"
 
 int main(int argc, char** argv) {
+    int choix = 0;
 
-
-    accueil();
-    choixPossible();
-    choixUtilisateur();
-
+    while (!choix){
+        accueil();
+        choixPossible();
+        choix = choixUtilisateur();
+    }
 
 ///////////////////////////////////////////////////////
     // MAP D'EXEMPLE

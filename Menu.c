@@ -7,8 +7,8 @@ void accueil(){
 }
 
 void choixPossible(){
-    printf("1 - Démarrer une nouvelle partie\n");
-    printf("2 - Démarrer le serveur\n");
+    printf("1 - Demarrer une nouvelle partie\n");
+    printf("2 - Demarrer le serveur\n");
     printf("3 - Rejoindre un serveur\n");
 }
 
@@ -75,15 +75,19 @@ void game(Map* m) {
 }
 
 
-void choixUtilisateur(){
+int choixUtilisateur(){
 
     printf("Faites votre choix : \n");
 
-    int choix=1;
+    int choix = 1;
     scanf("%d", &choix);
+    fflush(stidn);
+
     switch (choix) {
         case 1:
             printf("Une nouvelle partie commence : %d\n", choix);
+
+            // TODO : passer les chemins ci-dessous en chemins relatifs
             char* configurationFiles[] = {"C:\\Users\\Ephraim\\Desktop\\IABD\\CasseBrique\\exampleMap.txt",
                                           "C:\\Users\\Ephraim\\Desktop\\IABD\\CasseBrique\\exampleMap2.txt",
                                           "C:\\Users\\Ephraim\\Desktop\\IABD\\CasseBrique\\exampleMap3.txt"
@@ -101,12 +105,15 @@ void choixUtilisateur(){
 
         case 2:
             printf("Un nouveau serveur vient d'être lancé : \n", choix);
+            return 1;
             exit(2);
         case 3:
             printf("Voici la liste des serveurs disponibles : \n", choix);
+            return 1;
             exit(3);
         default:
             printf("Le choix est incorrect : Réessayer : \n", choix);
+            return 0;
     }
 }
 
