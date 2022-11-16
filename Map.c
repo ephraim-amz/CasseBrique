@@ -336,16 +336,14 @@ bool checkTheMooveAndMoove(int r, int c, Map *map, int actualPlayer, char move) 
     switch (move) {
         case 'u':
             if (actualRow == 0) {
-                if (isFree(map, r-1, colToCheck)){
-                    rowToCheck = r - 1;
-                }
+                rowToCheck = r - 1;
             } else {
                 rowToCheck = actualRow - 1;
             }
 
             break;
         case 'd':
-            if (actualRow == r + 1) {
+            if (actualRow == r - 1) {
                 rowToCheck = 0;
             } else {
                 rowToCheck = actualRow + 1;
@@ -360,7 +358,7 @@ bool checkTheMooveAndMoove(int r, int c, Map *map, int actualPlayer, char move) 
             }
             break;
         case 'r':
-            if (actualColumn == c + 1) {
+            if (actualColumn == c - 1) {
                 colToCheck = 0;
             } else {
                 colToCheck = actualColumn + 1;

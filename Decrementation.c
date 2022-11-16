@@ -66,7 +66,7 @@ int decrementationMap(Map *m) {
         int valMaxPowerUp = 9;
         for (int i = 0; i < m->nbLignes; i++) {
             for (int j = 0; j < m->nbColonnes; j++) {
-                // si la valeur est supérieur à la valeur minimale (ex : 110) alors elle n'a pas encore explosée donc --> décrementation
+                // si la valeur est supérieure à la valeur minimale (ex : 110) alors elle n'a pas encore explosée donc --> décrementation
                 if ((m->tab[i][j] > valeur_min_bombe && m->tab[i][i] < valeur_max_bombe) ||
                     (m->tab[i][i] > valeur_min_bombe_joueur && m->tab[i][i] <
                                                                valeur_max_bombe_joueur)) // j'ai besoin de la "valeur_max_bombe_joueur" si le J est posé dessus
