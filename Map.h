@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
-#include <math.h>
+#include <string.h>
 #include "Joueur.h"
 
 
@@ -35,7 +35,7 @@ bool isAWall(Map* map, int row, int column);
 
 bool isAUnbreakableWall(Map* map, int row, int column);
 
-bool verifVictoire(Map* m);
+int verifVictoire(int nbr_players, Joueur* joueur_array);
 
 bool isARegularWall(Map* map, int row, int column);
 

@@ -1,7 +1,12 @@
 1
-5 5
-xxxxx
-xp  x
-x   x
-x m x
-x mpx
+10 10
+xxxxxxxxxx
+x   xx pxx
+x   mx   x
+x m m    x
+x    x   x
+x   m    x
+x m m    x
+x   m    x
+x mp     x
+xxxxxxxxxx

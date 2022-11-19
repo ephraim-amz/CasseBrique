@@ -2,17 +2,21 @@
 #include "Map.h"
 #include "Joueur.h"
 
-void accueil(){
+void accueil() {
+
     printf("Bienvenue sur le jeu Casse Brique\n");
 }
 
-void choixPossible(){
+void choixPossible() {
+
     printf("1 - Demarrer une nouvelle partie\n");
+
     printf("2 - Demarrer le serveur\n");
+
     printf("3 - Rejoindre un serveur\n");
 }
 
-void game(Map* m) {
+void game(Map *m) {
     int actualPlayer = 1;
     int maxPlayer = m->nbMaxPlayer;
     bool end = false;
@@ -31,15 +35,18 @@ void game(Map* m) {
 
         // Input
         if (!inputAllowed) {
+
             printf("Mouvement non reconnu. Rejouez.\n");
             inputAllowed = true;
         }
         if (!moovePossible) {
+
             printf("Mouvement impossible. Rejouez.\n");
             moovePossible = true;
         }
 
         // Ask Input
+
         printf("Tour du Joueur %d \nAction a effectuer :\n", actualPlayer);
         scanf("%c", &input);
         fflush(stdin);
@@ -67,53 +74,54 @@ void game(Map* m) {
         } else {
             ++actualPlayer;
         }
-        printTab(m->tab, m->nbLignes, m->nbColonnes);
         //end =1;
-        verifVictoire(m);
+        bool isOver = verifVictoire(m->nbMaxPlayer, m->joueurs);
+        if (isOver) {
+            end = true;
+        }
     }
 
 }
 
 
-int choixUtilisateur(){
+bool choixUtilisateur() {
 
     printf("Faites votre choix : \n");
 
-    int choix = 1;
+    int choix;
     scanf("%d", &choix);
-    fflush(stidn);
-
+    fflush(stdin);
+    char *configurationFiles[] = {"exampleMap.txt",
+                                  "exampleMap2.txt",
+                                  "exampleMap3.txt"
+    };
     switch (choix) {
-        case 1:
-            printf("Une nouvelle partie commence : %d\n", choix);
-
-            // TODO : passer les chemins ci-dessous en chemins relatifs
-            char* configurationFiles[] = {"C:\\Users\\Ephraim\\Desktop\\IABD\\CasseBrique\\exampleMap.txt",
-                                          "C:\\Users\\Ephraim\\Desktop\\IABD\\CasseBrique\\exampleMap2.txt",
-                                          "C:\\Users\\Ephraim\\Desktop\\IABD\\CasseBrique\\exampleMap3.txt"
-            };
-            srand(time(NULL));
+        case 1: {
             int fileIndex = rand() % 3;
 
-            Map* m = createMapViaFile(configurationFiles[fileIndex]);
+            Map *m = createMapViaFile(configurationFiles[fileIndex]);
+            printf("Une nouvelle partie commence : %d\n", choix);
 
 
             game(m);
 
 
             freeMap(m, m->nbLignes);
+        }
+
 
         case 2:
+
             printf("Un nouveau serveur vient d'être lancé : \n", choix);
-            return 1;
-            exit(2);
+            return true;
         case 3:
+
             printf("Voici la liste des serveurs disponibles : \n", choix);
-            return 1;
-            exit(3);
+            return true;
         default:
+
             printf("Le choix est incorrect : Réessayer : \n", choix);
-            return 0;
+            return true;
     }
 }
 

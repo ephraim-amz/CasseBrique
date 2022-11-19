@@ -1,24 +1,25 @@
 #include "Map.h"
-#include "Menu.h"
 
 int main(int argc, char** argv) {
-    int choix = 0;
+
+    /*
+    bool choix = false;
+
+
+
 
     while (!choix){
         accueil();
         choixPossible();
         choix = choixUtilisateur();
     }
+     */
 
-///////////////////////////////////////////////////////
-    // MAP D'EXEMPLE
+    int* infos = getInfos("map1.txt");
 
-    //int **map1 = garbage();
-
-
-
-    // TODO : sélectionner une map dans la pool et récupérer les informations de cette map dans un tableau
-    
+    for (int i = 0; i < 4; ++i) {
+        printf("%d\n", infos[i]);
+    }
 
 
     return 0;
