@@ -1,27 +1,12 @@
 #include "Joueur.h"
 #include "Map.h"
 #include "colors.h"
+#include "Bombe.h"
 
 void free_player(Joueur* j){
     free(j);
 }
 
-Joueur createJoueur(int nbVies, int nbBombesMax, int nbBombesActuel, int powerBombe, int numPlayer) {
-    Bombe *b = malloc(sizeof(Bombe) * nbBombesMax);
-    for (int i = 0; i < nbBombesMax; ++i) {
-        b[i] = createBombe(powerBombe);
-    }
-    Joueur j = {
-            .nbVies = nbVies,
-            .nbBombesMax = nbBombesMax,
-            .nbBombesActuel = nbBombesActuel,
-            .powerBombe = powerBombe,
-            .bombes = b,
-            .numPlayer = numPlayer
-    };
-
-    return j;
-}
 
 int checkInput(char input) {
     if (
@@ -38,22 +23,29 @@ int checkInput(char input) {
     }
 }
 
+
 bool isAlive(Joueur* j){
     return j->nbVies >= 1;
 }
 
+
 void removeLife(Joueur* j){
-    if (isAlive(j)){
-        j->nbVies--;
-        printf("Joueur %d, il vous reste %d vie(s)\n", j->numPlayer, j->nbVies);
-    } else{
-        printf("Joueur %d, vous venez êtes mort à cause d'une bombe\n", j->numPlayer);
-        freePlayer(j);
+    // Verification si joueur invincible
+    if(j->invincible == 0)
+    {
+        if(j->coeur > 0)
+        {
+            j->coeur = -1;
+        }
+        else
+        {
+            j->nbVies--;
+        }
     }
 }
 
 
-int checkTheMooveAndMoove(int r, int c, int map[r][c], char move, int timerOfABomb, Joueur joueur){
+int checkTheMooveAndMoove(int r, int c, Map* map, char move, int timerOfABomb, Joueur joueur){
     int actualRow, actualColumn;
     int found = 0;
     int actualPlayer = 10000 * joueur.id;
@@ -64,8 +56,8 @@ int checkTheMooveAndMoove(int r, int c, int map[r][c], char move, int timerOfABo
     for(actualRow = 0; actualRow < r; ++actualRow){
         for(actualColumn = 0; actualColumn < c; ++actualColumn){
             if(
-                    map[actualRow][actualColumn] >= actualPlayer
-                    && map[actualRow][actualColumn] <= actualPlayer + 9999
+                    map->tab[actualRow][actualColumn] >= actualPlayer
+                    && map->tab[actualRow][actualColumn] <= actualPlayer + 9999
                     ){
                 found = 1;
                 break;
@@ -115,14 +107,14 @@ int checkTheMooveAndMoove(int r, int c, int map[r][c], char move, int timerOfABo
             break;
         case 'x':
             // Verifier s'il n'y a pas déjà une bombe sur la case et si le joueur a encore des bombes en stock
-            if(map[actualRow][actualColumn] % 10000 > 0 || joueur.nbBombesActuel == joueur.nbBombesMax)
+            if(map->tab[actualRow][actualColumn] % 10000 > 0 || joueur.nbBombesActuel == joueur.nbBombesMax)
             {
                 return 0;
             }
             else
             {
                 int newBomb = joueur.id * 1000 + joueur.powerBombe * 100 + timerOfABomb;
-                map[actualRow][actualColumn] += newBomb;
+                map->tab[actualRow][actualColumn] += newBomb;
                 ++joueur.nbBombesActuel;
                 return 1;
             }
@@ -132,8 +124,8 @@ int checkTheMooveAndMoove(int r, int c, int map[r][c], char move, int timerOfABo
             return 0;
     }
 
-    // Verification de ce qu'il y a dans la case d'arivee : si upgrade ou case vide -> deplacement OK
-    int destination = map[rowToCheck][colToCheck];
+    // Verification de ce qu'il y a dans la case d'arrivée : si upgrade ou case vide -> déplacement OK
+    int destination = map->tab[rowToCheck][colToCheck];
 
     if(
             destination == 0                                                 // case vide
@@ -141,8 +133,8 @@ int checkTheMooveAndMoove(int r, int c, int map[r][c], char move, int timerOfABo
             || (gotPass && (destination >= 1000 && destination <= 9999))     // bombe mais a un item pass
             )
     {
-        map[actualRow][actualColumn] -= actualPlayer;
-        map[rowToCheck][colToCheck] += actualPlayer;
+        map->tab[actualRow][actualColumn] -= actualPlayer;
+        map->tab[rowToCheck][colToCheck] += actualPlayer;
 
         // catch item
         if(destination >= 3 && destination <= 12){
@@ -187,12 +179,12 @@ int checkTheMooveAndMoove(int r, int c, int map[r][c], char move, int timerOfABo
                     break;
             }
             // l'objet disparait
-            map[rowToCheck][colToCheck] -= destination;
+            map->tab[rowToCheck][colToCheck] -= destination;
         }
         return 1;
     }
 
-    // Si il y a une bombe mais que le joueur a des boots --> deplacement OK
+    // S'il y a une bombe, mais que le joueur a des boots --> deplacement OK
     else if(gotBoots && (destination >= 1000 && destination <= 9999)){
         // TODO : calculer la case d'arrivée de la bombe et l'y déplacer
 

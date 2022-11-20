@@ -4,18 +4,14 @@
 #include "stdbool.h"
 #include "Map.h"
 
-#ifndef CASSEBRIQUE_BOMBE_H
-#define CASSEBRIQUE_BOMBE_H
 
-int dropLoot(float taux_loot);
-/**
- * @brief Structure bombe
- */
+int dropLoot(int taux_loot);
+/*
 typedef struct {
     int portee;
     bool estPose;
 } Bombe;
-
+*/
 /**
  * @brief Permet de créer une bombe
  * @return

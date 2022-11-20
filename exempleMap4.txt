@@ -1,0 +1,17 @@
+1       // nb bombe base
+7 7     // nbLignes + nbColonnes
+2       // taux_loot
+4       // nbMaxPlayer
+1       // start_nbVies
+1       // start_nbBombe
+1       // start_powerBombe
+4       // bombe_compteur
+0       // start_boots
+0       // start_pass
+xxxxxxx
+xp m px
+x xmx x
+xmmmmmx
+x xmx x
+xp m px
+xxxxxxx

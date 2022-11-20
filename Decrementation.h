@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "struct.h"
 #include "Map.h"
 #include "Joueur.h"
 

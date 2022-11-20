@@ -2,6 +2,7 @@
 #include "Map.h"
 #include "colors.h"
 
+
 int **createTab(int rows, int columns) {
     int **tab = malloc(sizeof(int *) * rows);
     for (int i = 0; i < columns; ++i) {
@@ -15,44 +16,45 @@ int **createTab(int rows, int columns) {
     return tab;
 }
 
+
 // Fonction problématique dans Joueur.c
-Joueur* createJoueur(Map mapPlayed){
-    int maxPlayer = mapPlayed.nbMaxPlayer;
+Joueur* createJoueurFromMapData(Map* mapPlayed){
+    int maxPlayer = mapPlayed->nbMaxPlayer;
     Joueur* playerList = malloc(maxPlayer * sizeof(Joueur));
 
     for (int i = 0; i < maxPlayer; ++i) {
         playerList[i].id = i+1;
-        playerList[i].nbVies = mapPlayed.start_nbVies;
-        playerList[i].coeur = mapPlayed.start_coeur;
-        playerList[i].nbBombesMax = mapPlayed.start_nbBombe;
+        playerList[i].nbVies = mapPlayed->start_nbVies;
+        playerList[i].coeur = mapPlayed->start_coeur;
+        playerList[i].nbBombesMax = mapPlayed->start_nbBombe;
         playerList[i].nbBombesActuel = 0;
-        playerList[i].powerBombe = mapPlayed.start_powerBombe;
-        playerList[i].boots = mapPlayed.start_boots;
-        playerList[i].pass = mapPlayed.start_pass;
+        playerList[i].powerBombe = mapPlayed->start_powerBombe;
+        playerList[i].boots = mapPlayed->start_boots;
+        playerList[i].pass = mapPlayed->start_pass;
+        playerList[i].invincible = 0;
     }
 
     return playerList;
 }
 
-Map *createMap(int nbLignes, int nbColonnes, int nbVies, int nbMaxPlayer, int nbBombeBase, float txLoot) {
 
+Map *createMap(int nbLignes, int nbColonnes, int nbVies, int nbMaxPlayer, int nbBombeBase, int txLoot) {
+
+    // Initialisation de la map de jeu avec les informations du fichier
     Map *m = malloc(sizeof(Map));
     *m = (Map) {
             .tab = createTab(nbLignes, nbColonnes),
             .nbLignes = nbLignes,
             .nbColonnes = nbColonnes,
-            .nbVies = nbVies,
+            .start_nbVies = nbVies,
             .nbMaxPlayer = nbMaxPlayer,
-            .nbBombeBase = nbBombeBase,
-            .txLoot = txLoot
+            .start_nbBombe = nbBombeBase,
+            .taux_loot = txLoot
     };
-    m->joueurs = malloc(sizeof(Joueur) * nbMaxPlayer);
-    for (int i = 0; i < nbMaxPlayer; ++i) {
-        m->joueurs[i] = createJoueur(nbVies, nbBombeBase, nbBombeBase, 2, i);
-    }
 
     return m;
 }
+
 
 FILE *loadFile(char *filename) {
     FILE *f;
@@ -66,6 +68,7 @@ FILE *loadFile(char *filename) {
         return f;
     }
 }
+
 
 int *getInfos(char *filename) {
     FILE *mapFile = loadFile(filename);
@@ -126,6 +129,7 @@ int *getInfos(char *filename) {
     return infos;
 }
 
+
 Map *createMapViaFile(char *filename) {
     FILE *mapFile = loadFile(filename);
     char line[128];
@@ -137,15 +141,19 @@ Map *createMapViaFile(char *filename) {
     int nbColonnes = infos[2];
     int nbPlayers = infos[3];
     int currentLine = 0;
-    Map *map = createMap(nbLignes, nbColonnes, 2, nbPlayers, nbBombes, 0.f);
+
+    Map *map = createMap(nbLignes, nbColonnes, 2, nbPlayers, nbBombes, 0);
+    map->joueurs = createJoueurFromMapData(map);
     int **tab = createTab(nbLignes, nbColonnes);
+
     while (fgets(line, sizeof(line), mapFile) != NULL) {
         if (cpt > 1) {
             int player = 0;
+
             for (int i = 0; i < strlen(line) - 1; ++i) {
                 if (line[i] == 'p') {
                     map->nbMaxPlayer++;
-                    player += 1000;
+                    player += 10000;
                     tab[currentLine][i] = player;
                 }
                 if (line[i] == 'm') {
@@ -162,51 +170,13 @@ Map *createMapViaFile(char *filename) {
         }
         cpt++;
     }
+
     map->tab = tab;
     fclose(mapFile);
     free(infos);
     return map;
 }
 
-Map *createMapViaFile2(char *filename) {
-    FILE *mapFile = loadFile(filename);
-    int *infos = getInfos(filename);
-    int nbBombes = infos[0];
-    int nbLignes = infos[1];
-    int nbColonnes = infos[2];
-    int nbPlayers = infos[3];
-    Map *map = createMap(nbLignes, nbColonnes, 2, nbPlayers, nbBombes, 0.f);
-    int col = 0;
-    int row = 0;
-    int player = 0;
-    char c2;
-    while ((c2 = fgetc(mapFile)) != EOF) {
-        col++;
-        if (c2 == '\n' || c2 == '\0') {
-            row++;
-            col = 0;
-        }
-        if (c2 == 'm') {
-
-            map->tab[row - 2][col - 1] = 1;
-        }
-        if (c2 == 'x') {
-            map->tab[row - 2][col - 1] = 2;
-        }
-        if (c2 == 'p') {
-            player += 1000;
-            //printf("Joueur numéro %d cree en %d %d\n", player, tempr, tempc);
-            map->tab[row - 2][col - 1] = player;
-        }
-        if (c2 == ' ' && row >= 2) {
-            map->tab[row][col - 1] = 0;
-        }
-    }
-
-    fclose(mapFile);
-    free(infos);
-    return map;
-}
 
 void freeTab(int **tab, int r) {
     for (int i = 0; i < r; i++) {
@@ -215,40 +185,43 @@ void freeTab(int **tab, int r) {
     free(tab);
 }
 
+
 bool isFree(Map *map, int x, int y) {
     return map->tab[x][y] == 0;
 }
+
 
 bool isAUnbreakeableWall(Map *map, int x, int y) {
     return map->tab[x][y] == 2;
 }
 
+
 bool isARegularWall(Map *map, int x, int y) {
     return map->tab[x][y] == 1;
 }
 
+
 bool isAPlayer(Map *map, int x, int y) {
-    return map->tab[x][y] >= 1000;
+    return map->tab[x][y] >= 10000;
 }
 
-void updateMapAfterExplosion(Map *map, Bombe b, int row, int column) {
-   // setbuf(stdout, 0);
-   // printf("%d %d\n", row, column);
 
+void updateMapAfterExplosion(Map *map, Bombe b, int row, int column) {
+    Joueur* playerList = map->joueurs;
 
     if (isARegularWall(map,row,column)) {
         map->tab[row][column] = 0;
     }
     if (isAPlayer(map, row, column)) {
-        int player = map->tab[row][column] / 1000;
-        removeLife(&map->joueurs[player]);
+        int player = map->tab[row][column] / 10000;
+        removeLife(&playerList[player - 1]);
         map->tab[row][column] = 0;
     }
     if (map->tab[row][column] >= 110 && map->tab[row][column] <= 199) {
         afterExplosion(map, b, row, column);
     }
-
 }
+
 
 void afterExplosion(Map *map, Bombe b, int row, int column) {
     map->tab[row][column] = 0;
@@ -303,12 +276,9 @@ void afterExplosion(Map *map, Bombe b, int row, int column) {
                 updateMapAfterExplosion(map, b, row - 1, column + k);
             }
         }
-
     }
 
-
-    printTab(map->tab, map->nbLignes, map->nbColonnes);
-    //displayMap(map->nbLignes, map->nbColonnes, map->tab);
+    displayMap(map->nbLignes, map->nbColonnes, (Map *) map->tab);
 }
 
 
@@ -381,7 +351,7 @@ void printRules(int x){
 // Quand le compteur passe à 0, la bombe explose
 // Après chaque mouvement, le compteur est décrémenté
 */
-void displayMap(int r, int c, int map[r][c]){
+void displayMap(int r, int c, Map* map){
     int i, j, ruleLine;
 
     // Definition des caracteres à utiliser pour l'affichage
@@ -395,7 +365,7 @@ void displayMap(int r, int c, int map[r][c]){
         // Lecture de colonne
         if(i <= r){
             for (j = 0; j < c; ++j){
-                int elementInTheCase = map[i][j];
+                int elementInTheCase = map->tab[i][j];
 
                 // espaces entre les cases (esthetisme)
                 if ((i != 0 && i != r-1) && (j > 0)) {

@@ -1,91 +1,93 @@
 #include "Menu.h"
 #include "Map.h"
 #include "Joueur.h"
+#include "colors.h"
 
 void accueil() {
-    setbuf(stdout, 0);
     printf("Bienvenue sur le jeu Casse Brique\n");
-}
 
-void choixPossible() {
-    setbuf(stdout, 0);
     printf("1 - Demarrer une nouvelle partie\n");
-    setbuf(stdout, 0);
     printf("2 - Demarrer le serveur\n");
-    setbuf(stdout, 0);
     printf("3 - Rejoindre un serveur\n");
 }
 
-void game(Map *m) {
-    int actualPlayer = 1;
-    int maxPlayer = m->nbMaxPlayer;
-    bool end = false;
-    bool inputAllowed = true, moovePossible = true;
+void game(Map *mapPlayed) {
+    int maxPlayer = mapPlayed->nbMaxPlayer;
+
+    int actualPlayer = 1, end = 0, inputAllowed = 1, moovePossible = 1;
     char input;
 
-    while (!end) {
-        // TODO : Fonction Affichage ATH
-        // Faut aller chercher dans la structure des joueurs leurs paramètres actuels.
-        // rajouter en paramètre de la fonction le numéro du joueur pour pouvoir afficher genre "Tour du joueur 1"
-        // rajouter en paramètre de la fonction un int code erreur pour afficher genre "Coup invalide. Rejouer"
+    Joueur *playerList = (Joueur *) mapPlayed->joueurs;
 
-        // Affichage map
-        printTab(m->tab, m->nbLignes, m->nbColonnes);
-        //displayMap(m->nbLignes, m->nbColonnes, m->tab);
+    while (end != 1) {
+        // Vérification si le joueur est toujours vivant pour jouer
+        if (playerList[actualPlayer].nbVies > 0) {
+            // Affichage ATH
+            for (int i = 0; i < maxPlayer; ++i) {
+                displayATH(playerList[i], actualPlayer);
+            }
 
-        // Input
-        if (!inputAllowed) {
-            setbuf(stdout, 0);
-            printf("Mouvement non reconnu. Rejouez.\n");
-            inputAllowed = true;
+            // Affichage map
+            // TODO : correct the issue of map1 : can't pass the map from the struct
+            displayMap(mapPlayed->nbLignes, mapPlayed->nbColonnes,
+                       mapPlayed);
+
+            // Input
+            if (!inputAllowed) {
+                red();
+                printf("Mouvement non reconnu. Rejouez.\n");
+                inputAllowed = 1;
+                resetColor();
+            }
+            if (!moovePossible) {
+                red();
+                printf("Action impossible. Rejouez.\n");
+                moovePossible = 1;
+                resetColor();
+            }
+
+            // Ask Input
+            printf("Tour du Joueur %d \nAction a effectuer :", actualPlayer);
+            scanf("%c", &input);
+            fflush(stdin);
+
+            // Verification de l'input
+            inputAllowed = checkInput(input);
+
+            // Vérifie si le mouvement rentré est un mouvement autorisé
+            if (inputAllowed == 0) {
+                continue;
+            }
+
+            // Vérifie si le mouvement entré est réalisable et si oui le fait
+            moovePossible = checkTheMooveAndMoove(mapPlayed->nbLignes, mapPlayed->nbColonnes, (Map *) mapPlayed->tab, input,
+                                                  mapPlayed->bombe_compteur, playerList[actualPlayer]);
+            if (moovePossible == 0) {
+                continue;
+            }
         }
-        if (!moovePossible) {
-            setbuf(stdout, 0);
-            printf("Mouvement impossible. Rejouez.\n");
-            moovePossible = true;
-        }
-
-        // Ask Input
-        setbuf(stdout, 0);
-        printf("Tour du Joueur %d \nAction a effectuer :\n", actualPlayer);
-        scanf("%c", &input);
-        fflush(stdin);
-
-        // Verification de l'input
-        inputAllowed = checkInput(input);
-
-        // Si input pas OK on revient au début de la boucle
-        if (inputAllowed == 0) {
-            continue;
-        }
-
-        moovePossible = checkTheMooveAndMoove(m->nbLignes, m->nbColonnes, m, actualPlayer, input);
-        if (!moovePossible) {
-            continue;
-        }
-
-        // TODO : Màj de la map
 
 
-
-
+        // Tik des bombes, explosions et Changement du joueur
         if (actualPlayer == maxPlayer) {
+            // TODO : Tik des bombes et des buffs d'invincibilité
+
+            // TODO : explosion des bombes (mettre ça dans la fonction de tik des bombes)
+
+            // TODO : affichage d'une map représentant l'explosion
+
+
             actualPlayer = 1;
         } else {
             ++actualPlayer;
         }
-        //end =1;
-        bool isOver = verifVictoire(m->nbMaxPlayer, m->joueurs);
-        if (isOver) {
-            end = true;
-        }
-    }
 
+        end = verif_victoire(maxPlayer, playerList);
+    }
 }
 
 
 bool choixUtilisateur() {
-    setbuf(stdout, 0);
     printf("Faites votre choix : \n");
 
     int choix;
@@ -93,29 +95,25 @@ bool choixUtilisateur() {
     fflush(stdin);
     char *configurationFiles[] = {"exampleMap.txt",
                                   "exampleMap2.txt",
-                                  "exampleMap3.txt"
+                                  "exampleMap3.txt", "exempleMap4.txt"
     };
     switch (choix) {
         case 1:
             printf("Une nouvelle partie commence : %d\n", choix);
-            srand(time(NULL));
-            int fileIndex = rand() % 3;
+            int fileIndex = rand() % 4;
 
-            Map *m = createMapViaFile(configurationFiles[0]);
+            Map *m = createMapViaFile(configurationFiles[fileIndex]);
             printf("%d", m->nbLignes);
             game(m);
             freeMap(m, m->nbLignes);
 
         case 2:
-            setbuf(stdout, 0);
             printf("Un nouveau serveur vient d'être lancé : %d\n", choix);
             return true;
         case 3:
-            setbuf(stdout, 0);
             printf("Voici la liste des serveurs disponibles : %d\n", choix);
             return true;
         default:
-            setbuf(stdout, 0);
             printf("Le choix est incorrect : Réessayer : \n");
             return false;
     }

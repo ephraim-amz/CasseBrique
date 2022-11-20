@@ -65,6 +65,8 @@ int decrementationMap(Map *m) {
         int valeur_min_bombe_joueur = valeur_min_bombe + (k * 10000);
         int valeur_max_bombe_joueur = valeur_max_bombe + (k * 10000);
         int valMaxPowerUp = 9;
+
+
         for (int i = 0; i < m->nbLignes; i++) {
             for (int j = 0; j < m->nbColonnes; j++) {
                 // si la valeur est supérieure à la valeur minimale (ex : 110) alors elle n'a pas encore explosée donc --> décrementation
@@ -84,15 +86,21 @@ int decrementationMap(Map *m) {
 
                             // bombe_joueur retrouve le numéro du joueur (-1 pour l'index dans le tableau de joueurs)
                             int bombe_joueur = (m->tab[i][j] / 1000) - 1;
+
+
                             afterExplosion(m, m->joueurs[bombe_joueur].bombes[0], i, j);
+
                             if (m->tab[i][j] == valeur_min_check_joueur) {
                                 bombe_joueur = (m->tab[i][j] / 10000) - 1;
                             }
+
                             if (m->joueurs[bombe_joueur].nbBombesActuel < m->joueurs[bombe_joueur].nbBombesMax) {
                                 // mise à jour du nombre de bombes
                                 m->joueurs[bombe_joueur].nbBombesActuel += 1;
                             }
+
                             break;
+
                         } else {
                             // +10 correspond au différentes valeurs que pourrait posséder une bombe (en fonction des power up)
                             valeur_min_check += 100;

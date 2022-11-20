@@ -2,11 +2,11 @@
 #define CASSEBRIQUE_MENU_H
 
 #include <time.h>
+#include "struct.h"
 #include "Map.h"
 
 void accueil();
 
-void choixPossible();
 
 bool choixUtilisateur();
 
