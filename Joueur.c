@@ -1,7 +1,5 @@
 #include "Joueur.h"
-#include "Map.h"
 #include "colors.h"
-#include "Bombe.h"
 
 void free_player(Joueur* j){
     free(j);

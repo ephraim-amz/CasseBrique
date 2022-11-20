@@ -1,5 +1,14 @@
 1
-9 5
+9
+5
+2
+2
+1
+1
+1
+4
+0
+0
 xxxxxxxxx
 xp mmmmmx
 x mmxmx x

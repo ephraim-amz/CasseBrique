@@ -1,8 +1,0 @@
-1
-8 6
-xxxxxxxx
-x  mmmpx
-x  xm  x
-x      x
-xp  m  x
-xxxxxxxx

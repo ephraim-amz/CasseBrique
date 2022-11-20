@@ -18,12 +18,12 @@ int **createTab(int rows, int columns) {
 
 
 // Fonction problématique dans Joueur.c
-Joueur* createJoueurFromMapData(Map* mapPlayed){
+Joueur *createJoueurFromMapData(Map *mapPlayed) {
     int maxPlayer = mapPlayed->nbMaxPlayer;
-    Joueur* playerList = malloc(maxPlayer * sizeof(Joueur));
+    Joueur *playerList = malloc(maxPlayer * sizeof(Joueur));
 
     for (int i = 0; i < maxPlayer; ++i) {
-        playerList[i].id = i+1;
+        playerList[i].id = i + 1;
         playerList[i].nbVies = mapPlayed->start_nbVies;
         playerList[i].coeur = mapPlayed->start_coeur;
         playerList[i].nbBombesMax = mapPlayed->start_nbBombe;
@@ -69,62 +69,71 @@ FILE *loadFile(char *filename) {
     }
 }
 
-
 int *getInfos(char *filename) {
     FILE *mapFile = loadFile(filename);
     char line[128];
-    int cpt = 0;
+    int lineReaded = 0;
     long nbBombes;
     long nbLignes, nbColonnes;
-    int nbPlayers = 0;
     char *endPtr;
+    int *infos = malloc(sizeof(int) * 11);
+    long tauxLoot, start_nbVies, start_nbBombe, start_powerBombe, bombe_compteur, start_boots, start_pass, nbMaxPlayer;
     while (fgets(line, sizeof(line), mapFile) != NULL) {
-        if (cpt == 0) {
-            char *p;
-            nbBombes = strtol(strtok_s(line, "\n", &p), &p, 10);
-        } else if (cpt == 1) {
-            char *e;
-            int spaceIndex;
-            e = strchr(line, ' ');
-            spaceIndex = (int) (e - line);
-            char nbC[spaceIndex - 1];
-            int lenCol = strlen(line);
-            char nbL[lenCol];
-
-
-            for (int i = 0; i < spaceIndex; ++i) {
-                nbC[i] = line[i];
-            }
-
-            int cptL = 0;
-            for (int i = spaceIndex + 1; i < lenCol; ++i) {
-                if (line[i] != '\n') {
-                    nbL[cptL] = line[i];
-                    cptL++;
-                } else {
-                    break;
-                }
-            }
-
-            nbLignes = strtol(nbL, &endPtr, 10);
-            nbColonnes = strtol(nbC, &endPtr, 10);
-
-        } else {
-            for (int i = 0; i < strlen(line) - 1; ++i) {
-                if (line[i] == 'p') {
-                    nbPlayers++;
-                }
-            }
+        char *p;
+        switch (lineReaded) {
+            case 0:
+                nbBombes = strtol(strtok_s(line, "\n", &p), &p, 10);
+                break;
+            case 1:
+                nbColonnes = strtol(strtok_s(line, "\n", &p), &p, 10);
+                break;
+            case 2:
+                nbLignes = strtol(strtok_s(line, "\n", &p), &p, 10);
+                break;
+            case 3:
+                nbMaxPlayer = strtol(strtok_s(line, "\n", &p), &p, 10);
+                break;
+            case 4:
+                tauxLoot = strtol(strtok_s(line, "\n", &p), &p, 10);
+                break;
+            case 5:
+                start_nbVies = strtol(strtok_s(line, "\n", &p), &p, 10);
+                break;
+            case 6:
+                start_nbBombe = strtol(strtok_s(line, "\n", &p), &p, 10);
+                break;
+            case 7:
+                start_powerBombe = strtol(strtok_s(line, "\n", &p), &p, 10);
+                break;
+            case 8:
+                bombe_compteur = strtol(strtok_s(line, "\n", &p), &p, 10);
+                break;
+            case 9:
+                start_boots = strtol(strtok_s(line, "\n", &p), &p, 10);
+                break;
+            case 10:
+                start_pass = strtol(strtok_s(line, "\n", &p), &p, 10);
+                break;
+            default:
+                break;
         }
 
-        cpt++;
+        lineReaded++;
     }
 
-    int *infos = malloc(sizeof(int) * 4);
-    infos[0] = nbBombes;
+
+    infos[0] =  nbBombes;
     infos[1] = (int) nbLignes;
     infos[2] = (int) nbColonnes;
-    infos[3] = nbPlayers;
+    infos[3] = (int) nbMaxPlayer;
+    infos[4] = (int) tauxLoot;
+    infos[5] = (int) start_nbVies;
+    infos[6] = (int) start_nbBombe;
+    infos[7] = (int) start_powerBombe;
+    infos[8] = (int) bombe_compteur;
+    infos[9] = (int) start_boots;
+    infos[10] = (int) start_pass;
+
     fclose(mapFile);
     return infos;
 }
@@ -147,7 +156,7 @@ Map *createMapViaFile(char *filename) {
     int **tab = createTab(nbLignes, nbColonnes);
 
     while (fgets(line, sizeof(line), mapFile) != NULL) {
-        if (cpt > 1) {
+        if (cpt > 11) {
             int player = 0;
 
             for (int i = 0; i < strlen(line) - 1; ++i) {
@@ -207,9 +216,9 @@ bool isAPlayer(Map *map, int x, int y) {
 
 
 void updateMapAfterExplosion(Map *map, Bombe b, int row, int column) {
-    Joueur* playerList = map->joueurs;
+    Joueur *playerList = map->joueurs;
 
-    if (isARegularWall(map,row,column)) {
+    if (isARegularWall(map, row, column)) {
         map->tab[row][column] = 0;
     }
     if (isAPlayer(map, row, column)) {
@@ -283,13 +292,15 @@ void afterExplosion(Map *map, Bombe b, int row, int column) {
 
 
 void freeMap(Map *m, int r) {
+    freeBombe(m->joueurs->bombes);
+    free_player(m->joueurs);
     freeTab(m->tab, r);
     free(m);
 }
 
 
-void printRules(int x){
-    printf("%c%c%c%c||%c", 255,255,255,255,255);
+void printRules(int x) {
+    printf("%c%c%c%c||%c", 255, 255, 255, 255, 255);
     switch (x) {
         case 0:
             printf("Controles :");
@@ -351,7 +362,7 @@ void printRules(int x){
 // Quand le compteur passe à 0, la bombe explose
 // Après chaque mouvement, le compteur est décrémenté
 */
-void displayMap(int r, int c, Map* map){
+void displayMap(int r, int c, Map *map) {
     int i, j, ruleLine;
 
     // Definition des caracteres à utiliser pour l'affichage
@@ -361,25 +372,24 @@ void displayMap(int r, int c, Map* map){
     ruleLine = r < 7 ? 7 : r;
 
     // Lecture de ligne
-    for(i = 0; i < ruleLine; ++i){
+    for (i = 0; i < ruleLine; ++i) {
         // Lecture de colonne
-        if(i <= r){
-            for (j = 0; j < c; ++j){
+        if (i <= r) {
+            for (j = 0; j < c; ++j) {
                 int elementInTheCase = map->tab[i][j];
 
                 // espaces entre les cases (esthetisme)
-                if ((i != 0 && i != r-1) && (j > 0)) {
+                if ((i != 0 && i != r - 1) && (j > 0)) {
                     printf(" ");
                 }
 
                 // affichage du contenu des cases
-                if(elementInTheCase >= 10000)       // joueur
+                if (elementInTheCase >= 10000)       // joueur
                 {
                     elementInTheCase /= 10000;  // récupération du numéro du joueur
 
                     // Apply color to the player token
-                    switch (elementInTheCase)
-                    {
+                    switch (elementInTheCase) {
                         case 1 :
                             red();
                             break;
@@ -398,19 +408,16 @@ void displayMap(int r, int c, Map* map){
 
                     printf("%c", elementInTheCase + 48);
                     resetColor();
-                }
-                else if (elementInTheCase >= 1000 )       // bombes
+                } else if (elementInTheCase >= 1000)       // bombes
                 {
                     // bombe s'affiche en rouge si elle est sur le point d'exploser
                     int timer = elementInTheCase % 10;
-                    if(timer == 1)
-                    {
+                    if (timer == 1) {
                         red();
                     }
                     printf("%c", graphismesHD[13]);
                     resetColor();
-                }
-                else        // murs + boite + vide + powerup
+                } else        // murs + boite + vide + powerup
                 {
                     switch (elementInTheCase) {
                         case 3:
@@ -435,12 +442,12 @@ void displayMap(int r, int c, Map* map){
                 }
 
                 // Bloc supplémentaire entre chaque case pour les bordures hautes et basses de la map
-                if ((i == 0 || i == r-1) && (j != c-1)) {
+                if ((i == 0 || i == r - 1) && (j != c - 1)) {
                     printf("%c", 219);
                 }
             }
-        } else if(ruleLine <= 7) {
-            for (int k = 0; k < (c*2)-1; ++k) {
+        } else if (ruleLine <= 7) {
+            for (int k = 0; k < (c * 2) - 1; ++k) {
                 printf("%c", 255);
             }
         }
@@ -467,28 +474,21 @@ void displayATH(Joueur player, int actualPlayer) {
             break;
     }
 
-    if(player.nbVies == 0)
-    {
+    if (player.nbVies == 0) {
         black();
         printf(":dead:%c", 255);
-    }
-
-    else if(actualPlayer == player.id)
-    {
-        printf("->%c%c", 255,255);
-    }
-
-    else
-    {
-        printf("%c%c%c%c", 255,255,255,255);
+    } else if (actualPlayer == player.id) {
+        printf("->%c%c", 255, 255);
+    } else {
+        printf("%c%c%c%c", 255, 255, 255, 255);
     }
 
     // Format d'une ligne d'ATH :
     // J1: x1 ♥ (+0♦) | 3/10 ó | x3 POWA | boots
     // Ajout de %c (255) à la fin des print pour être sûr d'avoir l'espace insecable
-    printf("J%d:%c", player.id,255);
+    printf("J%d:%c", player.id, 255);
     printf("x%d%c%c", player.nbVies, 3, 255);
-    int bouclier =  player.coeur == -1 ? 0 : player.coeur;
+    int bouclier = player.coeur == -1 ? 0 : player.coeur;
     printf("(+%d%c)%c", bouclier, 4, 255);
     int bombesEnPoche = player.nbBombesMax - player.nbBombesActuel;
     printf("| %d/%d %c%c", bombesEnPoche, player.nbBombesMax, 162, 255);
@@ -496,16 +496,11 @@ void displayATH(Joueur player, int actualPlayer) {
 
     // equipement
     printf("|%c", 255);
-    if (player.boots == 1)
-    {
+    if (player.boots == 1) {
         printf("boots");
-    }
-    else if (player.pass == 1)
-    {
+    } else if (player.pass == 1) {
         printf("pass");
-    }
-    else
-    {
+    } else {
         printf("none");
     }
 

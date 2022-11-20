@@ -4,12 +4,12 @@
 #include "colors.h"
 
 void accueil() {
-    printf("Bienvenue sur le jeu Casse Brique\n");
-
-    printf("1 - Demarrer une nouvelle partie\n");
-    printf("2 - Demarrer le serveur\n");
-    printf("3 - Rejoindre un serveur\n");
+    printf("#####################\n");
+    printf("# --- BOMBERMAN --- #\n");
+    printf("#####################\n");
+    //printf("#############");
 }
+
 
 void game(Map *mapPlayed) {
     int maxPlayer = mapPlayed->nbMaxPlayer;
@@ -84,38 +84,33 @@ void game(Map *mapPlayed) {
 
         end = verif_victoire(maxPlayer, playerList);
     }
+
+    freeMap(mapPlayed, mapPlayed->nbLignes);
 }
 
 
-bool choixUtilisateur() {
-    printf("Faites votre choix : \n");
-
-    int choix;
-    scanf("%d", &choix);
-    fflush(stdin);
-    char *configurationFiles[] = {"exampleMap.txt",
-                                  "exampleMap2.txt",
-                                  "exampleMap3.txt", "exempleMap4.txt"
+bool loadGame() {
+    // Charger les fichiers de map
+    char *configurationFiles[] = {"maps/Map1.txt",
+                                  "maps/Map2.txt",
+                                  "maps/Map3.txt",
+                                  "maps/Map4.txt"
     };
-    switch (choix) {
-        case 1:
-            printf("Une nouvelle partie commence : %d\n", choix);
-            int fileIndex = rand() % 4;
 
-            Map *m = createMapViaFile(configurationFiles[fileIndex]);
-            printf("%d", m->nbLignes);
-            game(m);
-            freeMap(m, m->nbLignes);
+    // Choix random de la map
+    srand(time(NULL));
+    int fileIndex = rand()%4;
+    printf("Map selectionnee : %d\n", fileIndex);
 
-        case 2:
-            printf("Un nouveau serveur vient d'être lancé : %d\n", choix);
-            return true;
-        case 3:
-            printf("Voici la liste des serveurs disponibles : %d\n", choix);
-            return true;
-        default:
-            printf("Le choix est incorrect : Réessayer : \n");
-            return false;
-    }
+    // Créé la structure Map en fonction du fichier de config
+    Map *m = createMapViaFile(configurationFiles[fileIndex]);
+
+    // Start game
+    game(m);
+
+    // TODO : free memory
+    freeMap(m, m->nbLignes);
+
+    return 0;
 }
 

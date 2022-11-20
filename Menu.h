@@ -2,16 +2,16 @@
 #define CASSEBRIQUE_MENU_H
 
 #include <time.h>
+#include <stdlib.h>
 #include "struct.h"
 #include "Map.h"
 
 void accueil();
 
 
-bool choixUtilisateur();
+bool loadGame();
 
 
 void game(Map* m);
 
-bool testChoix(int choix);
 #endif //CASSEBRIQUE_MENU_H
