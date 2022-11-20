@@ -3,4 +3,4 @@ project(CasseBrique C)
 
 set(CMAKE_C_STANDARD 99)
 
-add_executable(CasseBrique main.c Joueur.c Joueur.h Map.c Map.h colors.h colors.c)
+add_executable(CasseBrique main.c Joueur.c Joueur.h Map.c Map.h colors.h colors.c Bombe.h Bombe.c)

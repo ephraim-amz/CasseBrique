@@ -16,15 +16,17 @@ typedef struct {
     int* tab; // Le tableau en 2d
     int nbLignes;
     int nbColonnes;
-    float taux_loot;
+    int taux_loot;        // chance qu'une caisse lache un item = 1/taux_loot
 
     // Infos pour initialiser les joueurs
     int nbMaxPlayer;
     int start_nbVies;
+    int start_coeur;
     int start_nbBombe;
     int start_powerBombe;
     int bombe_compteur;
     int start_boots;
+    int start_pass;
 } Map;
 
 
@@ -36,7 +38,7 @@ Joueur* createJoueur(Map mapPlayed);
 
 void freeMap(Map *map, int r);
 
-void displayATH(Joueur player, int totalPlayer, int actualPlayer);
+void displayATH(Joueur player, int actualPlayer);
 
 void printRules(int x);
 

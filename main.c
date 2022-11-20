@@ -7,51 +7,28 @@ int main(int argc, char** argv) {
     // TODO créer la structure de la map à partir des information récupérées
     // MAP D'EXEMPLE
     int map1[7][7] = {
-            {2,2,2,2,2,2,2},
-            {2,10000,0,1,0,30000,2},
+            {2,0,2,2,2,2,2},
+            {0,10000,0,1,0,30000,0},
             {2,0,2,1,2,0,2},
             {2,1,1,1,1,1,2},
             {2,0,2,1,2,0,2},
             {2,40000,0,1,0,20000,2},
-            {2,2,2,2,2,2,2}
+            {2,0,2,2,2,2,2}
     };
 
     Map mapPlayed = {
             .tab = (int **) map1,
-            .nbColonnes = 7,
             .nbLignes = 7,
+            .nbColonnes = 7,
+            .taux_loot = 2,
 
             .nbMaxPlayer = 4,
             .start_nbVies = 1,
             .start_nbBombe = 1,
             .start_powerBombe = 1,
-            .bombe_compteur = 20,
+            .bombe_compteur = 4,
             .start_boots = 0
     };
-    //displayMap(mapPlayed.nbLignes, mapPlayed.nbColonnes, mapPlayed.tab);
-
-/*
-    // Nombre de joueurs à placer
-    int nmbPlayer;
-    printf("Nombre de joueurs (max : 4) :");
-    scanf("&d", nmbPlayer);
-    fflush(stdin);
-
-    if(nmbPlayer < 2 || nmbPlayer > 4){
-        nmbPlayer = 2;
-    }
-
-    // Nombre de bots parmi ces joueurs
-    int nmbBots;
-    printf("Nombre de bots (max : %d, defaut : 0) :", nmbPlayer);
-    scanf("&d", nmbBots);
-    fflush(stdin);
-
-    if(nmbBots < 0 || nmbBots > nmbPlayer){
-        nmbBots = 0;
-    }*/
-
-
 
     // Création des joueurs en fonction des paramètres de la map
     Joueur* playerList = createJoueur(mapPlayed);
@@ -69,7 +46,7 @@ int main(int argc, char** argv) {
         {
             // Affichage ATH
             for (int i = 0; i < maxPlayer; ++i) {
-                displayATH(playerList[i], maxPlayer, actualPlayer);
+                displayATH(playerList[i], actualPlayer);
             }
 
             // Affichage map
@@ -98,36 +75,28 @@ int main(int argc, char** argv) {
             // Verification de l'input
             inputAllowed = checkInput(input);
 
-            // Si input pas OK ou moove impossible on revient au début de la boucle
+            // Vérifie si le mouvement rentré est un mouvement autorisé
             if(inputAllowed == 0) {
                 continue;
             }
 
-            moovePossible = checkTheMooveAndMoove(mapPlayed.nbLignes, mapPlayed.nbColonnes, map1, actualPlayer, input, playerList[actualPlayer].boots, playerList[actualPlayer - 1], mapPlayed.bombe_compteur);
+            // Vérifie si le mouvement entré est réalisable et si oui le fait
+            moovePossible = checkTheMooveAndMoove(mapPlayed.nbLignes, mapPlayed.nbColonnes, map1, input, mapPlayed.bombe_compteur, playerList[actualPlayer]);
             if(moovePossible == 0) {
                 continue;
             }
-
-            // TODO : Màj de la map
-
-
-
-            // TODO : Tik des bombes
-
-
-
-            // TODO : explosion des bombes (peut être mettre ça dans la fonction de tik des bombes)
-
-
-
-            // TODO : Màj de la map
-
-
         }
 
 
-        // Changement du joueur
+        // Tik des bombes, explosions et Changement du joueur
         if(actualPlayer == maxPlayer) {
+            // TODO : Tik des bombes
+
+            // TODO : explosion des bombes (mettre ça dans la fonction de tik des bombes)
+
+            // TODO : affichage d'une map représentant l'explosion
+
+
             actualPlayer = 1;
         } else {
             ++actualPlayer;
@@ -135,6 +104,9 @@ int main(int argc, char** argv) {
 
         end = verif_victoire(maxPlayer, playerList);
     }
+
+    // TODO : free memory
+
 
     return 0;
 }
