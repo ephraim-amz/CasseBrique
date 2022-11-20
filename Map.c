@@ -14,12 +14,12 @@ int **createTab(int rows, int columns) {
     return tab;
 }
 
-void printTab(int **tab, int r, int c) {
-    for (int i = 0; i < r; i++) {
-        for (int j = 0; j < c; j++) {
-            // tab[i][j] = ++count;
+void printTab(int **tab, int nbRows, int nbColumns) {
+    for (int i = 0; i < nbRows; i++) {
+        for (int j = 0; j < nbColumns; j++) {
+            setbuf(stdout, 0);
             printf("%d ", tab[i][j]);
-            if (j == c - 1) {
+            if (j == nbColumns - 1) {
                 printf("\n");
             }
         }
@@ -58,7 +58,6 @@ FILE *loadFile(char *filename) {
         return f;
     }
 }
-
 
 int *getInfos(char *filename) {
     FILE *mapFile = loadFile(filename);
@@ -121,12 +120,54 @@ int *getInfos(char *filename) {
 
 Map *createMapViaFile(char *filename) {
     FILE *mapFile = loadFile(filename);
+    char line[128];
+
+    int cpt = 0;
     int *infos = getInfos(filename);
     int nbBombes = infos[0];
     int nbLignes = infos[1];
     int nbColonnes = infos[2];
     int nbPlayers = infos[3];
-    Map *map = createMap(nbLignes, nbColonnes, 2, nbPlayers, nbBombes, 0.);
+    int currentLine = 0;
+    Map *map = createMap(nbLignes, nbColonnes, 2, nbPlayers, nbBombes, 0.f);
+    int **tab = createTab(nbLignes, nbColonnes);
+    while (fgets(line, sizeof(line), mapFile) != NULL) {
+        if (cpt > 1) {
+            int player = 0;
+            for (int i = 0; i < strlen(line) - 1; ++i) {
+                if (line[i] == 'p') {
+                    map->nbMaxPlayer++;
+                    player += 1000;
+                    tab[currentLine][i] = player;
+                }
+                if (line[i] == 'm') {
+                    tab[currentLine][i] = 1;
+                }
+                if (line[i] == 'x') {
+                    tab[currentLine][i] = 2;
+                }
+                if (line[i] == ' ') {
+                    tab[currentLine][i] = 0;
+                }
+            }
+            currentLine++;
+        }
+        cpt++;
+    }
+    map->tab = tab;
+    fclose(mapFile);
+    free(infos);
+    return map;
+}
+
+Map *createMapViaFile2(char *filename) {
+    FILE *mapFile = loadFile(filename);
+    int *infos = getInfos(filename);
+    int nbBombes = infos[0];
+    int nbLignes = infos[1];
+    int nbColonnes = infos[2];
+    int nbPlayers = infos[3];
+    Map *map = createMap(nbLignes, nbColonnes, 2, nbPlayers, nbBombes, 0.f);
     int col = 0;
     int row = 0;
     int player = 0;
@@ -138,43 +179,22 @@ Map *createMapViaFile(char *filename) {
             col = 0;
         }
         if (c2 == 'm') {
-            /*
-            int tempr = row-2;
-            int tempc = col-1;
-            printf("Mur destructible cree en %d %d\n", tempr, tempc);
-            // map[row][col] = 0;
-             */
+
             map->tab[row - 2][col - 1] = 1;
         }
         if (c2 == 'x') {
-            /*
-            int tempr = row-2;
-            int tempc = col-1;
-            printf("Mur indestructible cree en %d %d\n", tempr, tempc);
-             */
             map->tab[row - 2][col - 1] = 2;
         }
         if (c2 == 'p') {
-
-            int tempr = row - 2;
-            int tempc = col - 1;
             player += 1000;
             //printf("Joueur numéro %d cree en %d %d\n", player, tempr, tempc);
-
             map->tab[row - 2][col - 1] = player;
         }
         if (c2 == ' ' && row >= 2) {
-            /*
-            int tempr = row-2;
-            int tempc = col-1;
-            printf("Espace libre cree en %d %d\n", tempr, tempc);
-             */
             map->tab[row][col - 1] = 0;
         }
-
     }
 
-    // printTab(map->tab, map->nbLignes, map->nbColonnes);
     fclose(mapFile);
     free(infos);
     return map;
@@ -199,13 +219,90 @@ bool isARegularWall(Map *map, int x, int y) {
     return map->tab[x][y] == 1;
 }
 
-bool isAWall(Map *map, int x, int y) {
-    return isARegularWall(map, x, y) || isAUnbreakeableWall(map, x, y);
-}
-
 bool isAPlayer(Map *map, int x, int y) {
     return map->tab[x][y] >= 1000;
 }
+
+void updateMapAfterExplosion(Map *map, Bombe b, int row, int column) {
+   // setbuf(stdout, 0);
+   // printf("%d %d\n", row, column);
+
+
+    if (isARegularWall(map,row,column)) {
+        map->tab[row][column] = 0;
+    }
+    if (isAPlayer(map, row, column)) {
+        int player = map->tab[row][column] / 1000;
+        removeLife(&map->joueurs[player]);
+        map->tab[row][column] = 0;
+    }
+    if (map->tab[row][column] >= 110 && map->tab[row][column] <= 199) {
+        afterExplosion(map, b, row, column);
+    }
+
+}
+
+void afterExplosion(Map *map, Bombe b, int row, int column) {
+    map->tab[row][column] = 0;
+    for (int k = 1; k <= b.portee; ++k) {
+        if (column - k >= 0) {
+            updateMapAfterExplosion(map, b, row, column - k);
+        }
+        if (column + k <= map->nbColonnes) {
+            updateMapAfterExplosion(map, b, row, column + k);
+        }
+        if (row - k >= 0) {
+            updateMapAfterExplosion(map, b, row - k, column);
+        }
+        if (row + k <= map->nbLignes) {
+            updateMapAfterExplosion(map, b, row + k, column);
+        }
+        if (row + k <= map->nbLignes && column + k <= map->nbColonnes) {
+            updateMapAfterExplosion(map, b, row + k, column + k);
+        }
+        if (row - k >= 0 && column - k >= 0) {
+            updateMapAfterExplosion(map, b, row - k, column - k);
+        }
+        if (row + k <= map->nbLignes && column - k >= 0) {
+            updateMapAfterExplosion(map, b, row + k, column - k);
+        }
+        if (row - k >= 0 && column + k <= map->nbColonnes) {
+            updateMapAfterExplosion(map, b, row - k, column + k);
+        }
+        if (k == 2) {
+            if (row + k >= 0 && column - 1 >= 0) {
+                updateMapAfterExplosion(map, b, row + k, column - 1);
+            }
+            if (row - 1 >= 0 && column - k >= 0) {
+                updateMapAfterExplosion(map, b, row - 1, column - k);
+            }
+            if (row - k >= 0 && column - 1 >= 0) {
+                updateMapAfterExplosion(map, b, row - k, column - 1);
+            }
+            if (row + 1 >= 0 && column - k >= 0) {
+                updateMapAfterExplosion(map, b, row + 1, column - k);
+            }
+            if (row + 1 <= map->nbLignes && column + k <= map->nbColonnes) {
+                updateMapAfterExplosion(map, b, row + 1, column + k);
+            }
+            if (row + k <= map->nbLignes && column + 1 <= map->nbColonnes) {
+                updateMapAfterExplosion(map, b, row + k, column + 1);
+            }
+            if (row - k >= 0 && column + 1 <= map->nbColonnes) {
+                updateMapAfterExplosion(map, b, row - k, column + 1);
+            }
+            if (row - 1 >= 0 && column + k <= map->nbColonnes) {
+                updateMapAfterExplosion(map, b, row - 1, column + k);
+            }
+        }
+
+    }
+
+
+    printTab(map->tab, map->nbLignes, map->nbColonnes);
+    //displayMap(map->nbLignes, map->nbColonnes, map->tab);
+}
+
 
 void freeMap(Map *m, int r) {
     freeTab(m->tab, r);
@@ -213,34 +310,42 @@ void freeMap(Map *m, int r) {
 }
 
 void red() {
+    setbuf(stdout, 0);
     printf("\033[1;31m");
 }
 
 void yellow() {
+    setbuf(stdout, 0);
     printf("\033[1;33m");
 }
 
 void green() {
+    setbuf(stdout, 0);
     printf("\033[1;32m");
 }
 
 void cyan() {
+    setbuf(stdout, 0);
     printf("\033[1;36m");
 }
 
 void blue() {
+    setbuf(stdout, 0);
     printf("\033[1;34m");
 }
 
 void black() {
+    setbuf(stdout, 0);
     printf("\033[0;30m");
 }
 
 void purple() {
+    setbuf(stdout, 0);
     printf("\033[1;35m");
 }
 
 void resetColor() {
+    setbuf(stdout, 0);
     printf("\033[0m");
 }
 
@@ -278,9 +383,11 @@ void displayMap(int r, int c, int **map) {
             // espaces entre les cases
             if (i == 0 || i == r - 1) {
                 if (j != c - 1) {
+                    setbuf(stdout, 0);
                     printf("%c", 219);
                 }
             } else if (j > 0) {
+                setbuf(stdout, 0);
                 printf(" ");
             }
 
@@ -301,11 +408,14 @@ void displayMap(int r, int c, int **map) {
                         yellow();
                         break;
                 }*/
+                setbuf(stdout, 0);
                 printf("%c", elementInTheCase + 48);      // Joueur
                 //resetColor();
             } else if (elementInTheCase >= 10) {
+                setbuf(stdout, 0);
                 printf("%c", graphismesHD[3]);      // Bombe
             } else {
+                setbuf(stdout, 0);
                 printf("%c", graphismesHD[elementInTheCase]); // murs + boite + vide + powerup
             }
         }
@@ -389,13 +499,11 @@ bool checkTheMooveAndMoove(int r, int c, Map *map, int actualPlayer, char move) 
     return 0;
 }
 
-int verifVictoire(int nbr_players, Joueur* joueur_array) {
+int verifVictoire(int nbr_players, Joueur *joueur_array) {
     int players_alive = nbr_players;
     /// nbr de joueurs en vies
-    for (int i = 0; i < nbr_players; i++)
-    {
-        if (joueur_array[i].nbVies == 0)
-        {
+    for (int i = 0; i < nbr_players; i++) {
+        if (joueur_array[i].nbVies == 0) {
             players_alive -= 1;
             freePlayer(&joueur_array[i]);
         }
@@ -405,9 +513,9 @@ int verifVictoire(int nbr_players, Joueur* joueur_array) {
 
         for (int i = 0; i < nbr_players; i++) {
 
-            if (joueur_array[i].nbVies >= 1)
-            {
+            if (joueur_array[i].nbVies >= 1) {
                 green();
+                setbuf(stdout, 0);
                 printf("Le gagnant est J%d", joueur_array[i].numPlayer);
                 resetColor();
             }
@@ -415,6 +523,7 @@ int verifVictoire(int nbr_players, Joueur* joueur_array) {
     }
     if (players_alive == 0) {
         red();
+        setbuf(stdout, 0);
         printf("Tout le monde est mort !!");
         resetColor();
     }

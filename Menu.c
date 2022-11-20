@@ -3,16 +3,16 @@
 #include "Joueur.h"
 
 void accueil() {
-
+    setbuf(stdout, 0);
     printf("Bienvenue sur le jeu Casse Brique\n");
 }
 
 void choixPossible() {
-
+    setbuf(stdout, 0);
     printf("1 - Demarrer une nouvelle partie\n");
-
+    setbuf(stdout, 0);
     printf("2 - Demarrer le serveur\n");
-
+    setbuf(stdout, 0);
     printf("3 - Rejoindre un serveur\n");
 }
 
@@ -30,23 +30,23 @@ void game(Map *m) {
         // rajouter en paramètre de la fonction un int code erreur pour afficher genre "Coup invalide. Rejouer"
 
         // Affichage map
-        displayMap(m->nbLignes, m->nbColonnes, m->tab);
-
+        printTab(m->tab, m->nbLignes, m->nbColonnes);
+        //displayMap(m->nbLignes, m->nbColonnes, m->tab);
 
         // Input
         if (!inputAllowed) {
-
+            setbuf(stdout, 0);
             printf("Mouvement non reconnu. Rejouez.\n");
             inputAllowed = true;
         }
         if (!moovePossible) {
-
+            setbuf(stdout, 0);
             printf("Mouvement impossible. Rejouez.\n");
             moovePossible = true;
         }
 
         // Ask Input
-
+        setbuf(stdout, 0);
         printf("Tour du Joueur %d \nAction a effectuer :\n", actualPlayer);
         scanf("%c", &input);
         fflush(stdin);
@@ -85,7 +85,7 @@ void game(Map *m) {
 
 
 bool choixUtilisateur() {
-
+    setbuf(stdout, 0);
     printf("Faites votre choix : \n");
 
     int choix;
@@ -96,32 +96,28 @@ bool choixUtilisateur() {
                                   "exampleMap3.txt"
     };
     switch (choix) {
-        case 1: {
+        case 1:
+            printf("Une nouvelle partie commence : %d\n", choix);
+            srand(time(NULL));
             int fileIndex = rand() % 3;
 
-            Map *m = createMapViaFile(configurationFiles[fileIndex]);
-            printf("Une nouvelle partie commence : %d\n", choix);
-
-
+            Map *m = createMapViaFile(configurationFiles[0]);
+            printf("%d", m->nbLignes);
             game(m);
-
-
             freeMap(m, m->nbLignes);
-        }
-
 
         case 2:
-
-            printf("Un nouveau serveur vient d'être lancé : \n", choix);
+            setbuf(stdout, 0);
+            printf("Un nouveau serveur vient d'être lancé : %d\n", choix);
             return true;
         case 3:
-
-            printf("Voici la liste des serveurs disponibles : \n", choix);
+            setbuf(stdout, 0);
+            printf("Voici la liste des serveurs disponibles : %d\n", choix);
             return true;
         default:
-
-            printf("Le choix est incorrect : Réessayer : \n", choix);
-            return true;
+            setbuf(stdout, 0);
+            printf("Le choix est incorrect : Réessayer : \n");
+            return false;
     }
 }
 

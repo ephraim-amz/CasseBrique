@@ -55,6 +55,7 @@ int decrementation(int **tab, int r, int c, Joueur *joueur_array, int nbr_player
     return explosion;
 }
 
+
 int decrementationMap(Map *m) {
     int explosion = 0;
     for (int k = 1; k <= m->nbMaxPlayer; k++) {
@@ -80,8 +81,10 @@ int decrementationMap(Map *m) {
                     {
                         if (m->tab[i][j] == valeur_min_check || m->tab[i][j] == valeur_min_check_joueur) {
                             explosion = 1;
+
                             // bombe_joueur retrouve le numéro du joueur (-1 pour l'index dans le tableau de joueurs)
                             int bombe_joueur = (m->tab[i][j] / 1000) - 1;
+                            afterExplosion(m, m->joueurs[bombe_joueur].bombes[0], i, j);
                             if (m->tab[i][j] == valeur_min_check_joueur) {
                                 bombe_joueur = (m->tab[i][j] / 10000) - 1;
                             }

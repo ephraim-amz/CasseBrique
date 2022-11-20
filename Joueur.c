@@ -33,6 +33,19 @@ int checkInput(char input) {
     }
 }
 
+bool isAlive(Joueur* j){
+    return j->nbVies >= 1;
+}
+
+void removeLife(Joueur* j){
+    if (isAlive(j)){
+        j->nbVies--;
+        printf("Joueur %d, il vous reste %d vie(s)\n", j->numPlayer, j->nbVies);
+    } else{
+        printf("Joueur %d, vous venez êtes mort à cause d'une bombe\n", j->numPlayer);
+        freePlayer(j);
+    }
+}
 
 void freePlayer(Joueur *j) {
     freeBombe(j->bombes);

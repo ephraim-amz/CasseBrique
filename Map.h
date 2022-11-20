@@ -31,9 +31,9 @@ bool checkTheMooveAndMoove(int r, int c, Map *map, int actualPlayer, char move);
 
 bool isFree(Map* m, int row, int column);
 
-bool isAWall(Map* map, int row, int column);
-
 bool isAUnbreakableWall(Map* map, int row, int column);
+
+bool isAPlayer(Map *map, int x, int y);
 
 int verifVictoire(int nbr_players, Joueur* joueur_array);
 
@@ -51,9 +51,10 @@ int* getInfos(char* filename);
 
 void freeMap(Map* map, int r);
 
-void exploseBombe(Map *m, Bombe* b);
+void updateMapAfterExplosion(Map *map, Bombe b, int i, int j);
+void afterExplosion(Map *map, Bombe b, int row, int j);
 
-void printTab(int** tab, int r, int c);
+void printTab(int** tab, int nbRows, int nbColumns);
 
 void red();
 
@@ -72,5 +73,6 @@ void purple();
 void resetColor();
 
 void displayMap(int r, int c, int** map);
+
 
 #endif //CASSEBRIQUE_MAP_H

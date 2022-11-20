@@ -35,4 +35,8 @@ void freePlayer(Joueur* j);
 
 int checkInput(char input);
 
+bool isAlive(Joueur* j);
+
+void removeLife(Joueur* j);
+
 #endif //CASSEBRIQUE_JOUEUR_H
