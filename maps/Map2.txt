@@ -9,9 +9,9 @@
 4
 0
 0
-x xxxx x
+x.xxxx.x
 xmmmmmpx
-x xmmx x
-x xmmx x
+x.xmmx.x
+x.xmmx.x
 xpmmmmmx
-x xxxx x
+x.xxxx.x

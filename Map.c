@@ -155,9 +155,10 @@ Map *createMapViaFile(char *filename) {
     map->joueurs = createJoueurFromMapData(map);
     int **tab = createTab(nbLignes, nbColonnes);
 
+    int player = 0;
     while (fgets(line, sizeof(line), mapFile) != NULL) {
-        if (cpt > 11) {
-            int player = 0;
+        if (cpt > 10) {
+
 
             for (int i = 0; i < strlen(line) - 1; ++i) {
                 if (line[i] == 'p') {
@@ -171,7 +172,7 @@ Map *createMapViaFile(char *filename) {
                 if (line[i] == 'x') {
                     tab[currentLine][i] = 2;
                 }
-                if (line[i] == ' ') {
+                if (line[i] == '.') {
                     tab[currentLine][i] = 0;
                 }
             }

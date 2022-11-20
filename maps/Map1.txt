@@ -10,7 +10,7 @@
 0
 0
 xxxxxxxxx
-xp mmmmmx
-x mmxmx x
-xmmmmm px
+xp.mmmmmx
+x.mmxmx x
+xmmmmm.px
 xxxxxxxxx
