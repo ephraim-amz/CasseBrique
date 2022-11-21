@@ -17,7 +17,6 @@ int **createTab(int rows, int columns) {
 }
 
 
-// Fonction problématique dans Joueur.c
 Joueur *createJoueurFromMapData(Map *mapPlayed) {
     int maxPlayer = mapPlayed->nbMaxPlayer;
     Joueur *playerList = malloc(maxPlayer * sizeof(Joueur));
@@ -32,13 +31,14 @@ Joueur *createJoueurFromMapData(Map *mapPlayed) {
         playerList[i].boots = mapPlayed->start_boots;
         playerList[i].pass = mapPlayed->start_pass;
         playerList[i].invincible = 0;
+        playerList[i].alreadyHurt = 0;
     }
 
     return playerList;
 }
 
 
-Map *createMap(int nbLignes, int nbColonnes, int nbVies, int nbMaxPlayer, int nbBombeBase, int txLoot) {
+Map *createMap(int nbLignes, int nbColonnes, int nbVies, int nbCoeur, int nbMaxPlayer, int nbBombeBase, int txLoot, int start_powerBombe, int bombe_compteur, int start_boots, int start_pass) {
 
     // Initialisation de la map de jeu avec les informations du fichier
     Map *m = malloc(sizeof(Map));
@@ -46,10 +46,15 @@ Map *createMap(int nbLignes, int nbColonnes, int nbVies, int nbMaxPlayer, int nb
             .tab = createTab(nbLignes, nbColonnes),
             .nbLignes = nbLignes,
             .nbColonnes = nbColonnes,
-            .start_nbVies = nbVies,
+            .taux_loot = txLoot,
             .nbMaxPlayer = nbMaxPlayer,
+            .start_nbVies = nbVies,
+            .start_coeur = nbCoeur,
             .start_nbBombe = nbBombeBase,
-            .taux_loot = txLoot
+            .start_powerBombe = start_powerBombe,
+            .bombe_compteur = bombe_compteur,
+            .start_boots = start_boots,
+            .start_pass = start_pass
     };
 
     return m;
@@ -69,6 +74,7 @@ FILE *loadFile(char *filename) {
     }
 }
 
+
 int *getInfos(char *filename) {
     FILE *mapFile = loadFile(filename);
     char line[128];
@@ -77,7 +83,7 @@ int *getInfos(char *filename) {
     long nbLignes, nbColonnes;
     char *endPtr;
     int *infos = malloc(sizeof(int) * 11);
-    long tauxLoot, start_nbVies, start_nbBombe, start_powerBombe, bombe_compteur, start_boots, start_pass, nbMaxPlayer;
+    long tauxLoot, start_nbVies, nbCoeur, start_powerBombe, bombe_compteur, start_boots, start_pass, nbMaxPlayer;
     while (fgets(line, sizeof(line), mapFile) != NULL) {
         char *p;
         switch (lineReaded) {
@@ -100,7 +106,7 @@ int *getInfos(char *filename) {
                 start_nbVies = strtol(strtok_s(line, "\n", &p), &p, 10);
                 break;
             case 6:
-                start_nbBombe = strtol(strtok_s(line, "\n", &p), &p, 10);
+                nbCoeur = strtol(strtok_s(line, "\n", &p), &p, 10);
                 break;
             case 7:
                 start_powerBombe = strtol(strtok_s(line, "\n", &p), &p, 10);
@@ -128,7 +134,7 @@ int *getInfos(char *filename) {
     infos[3] = (int) nbMaxPlayer;
     infos[4] = (int) tauxLoot;
     infos[5] = (int) start_nbVies;
-    infos[6] = (int) start_nbBombe;
+    infos[6] = (int) nbCoeur;
     infos[7] = (int) start_powerBombe;
     infos[8] = (int) bombe_compteur;
     infos[9] = (int) start_boots;
@@ -149,9 +155,17 @@ Map *createMapViaFile(char *filename) {
     int nbLignes = infos[1];
     int nbColonnes = infos[2];
     int nbPlayers = infos[3];
+    int txLoot = infos[4];
+    int nbVies = infos[5];
+    int nbCoeur = infos[6];
+    int start_powerBombe = infos[7];
+    int bombe_compteur = infos[8];
+    int start_boots = infos[9];
+    int start_pass = infos[10];
+
     int currentLine = 0;
 
-    Map *map = createMap(nbLignes, nbColonnes, 2, nbPlayers, nbBombes, 0);
+    Map *map = createMap(nbLignes, nbColonnes, nbVies, nbCoeur, nbPlayers, nbBombes, txLoot, start_powerBombe, bombe_compteur, start_boots, start_pass);
     map->joueurs = createJoueurFromMapData(map);
     int **tab = createTab(nbLignes, nbColonnes);
 
@@ -162,7 +176,6 @@ Map *createMapViaFile(char *filename) {
 
             for (int i = 0; i < strlen(line) - 1; ++i) {
                 if (line[i] == 'p') {
-                    map->nbMaxPlayer++;
                     player += 10000;
                     tab[currentLine][i] = player;
                 }
@@ -180,6 +193,7 @@ Map *createMapViaFile(char *filename) {
         }
         cpt++;
     }
+
 
     map->tab = tab;
     fclose(mapFile);
@@ -215,8 +229,8 @@ bool isAPlayer(Map *map, int x, int y) {
     return map->tab[x][y] >= 10000;
 }
 
-
-void updateMapAfterExplosion(Map *map, Bombe b, int row, int column) {
+/*
+void updateMapAfterExplosion(Map *map, int bombe_power, int row, int column) {
     Joueur *playerList = map->joueurs;
 
     if (isARegularWall(map, row, column)) {
@@ -228,67 +242,303 @@ void updateMapAfterExplosion(Map *map, Bombe b, int row, int column) {
         map->tab[row][column] = 0;
     }
     if (map->tab[row][column] >= 110 && map->tab[row][column] <= 199) {
-        afterExplosion(map, b, row, column);
+        afterExplosion(map, bombe_power, row, column);
+    }
+}*/
+
+
+void updateHealth(Joueur joueur){
+    if (joueur.invincible == 0){
+        if (joueur.coeur == 1)
+        {
+            joueur.coeur = -1;
+        }
+        else
+        {
+            --joueur.nbVies;
+        }
     }
 }
 
 
-void afterExplosion(Map *map, Bombe b, int row, int column) {
-    map->tab[row][column] = 0;
-    for (int k = 1; k <= b.portee; ++k) {
-        if (column - k >= 0) {
-            updateMapAfterExplosion(map, b, row, column - k);
+void afterExplosion(Map* map, int bombe_power, int rowOfBomb, int columnOfBomb, Joueur* joueurList, int owner) {
+    // Rendre la bombe à son propriétaire
+    joueurList[owner].nbBombesActuel -= 1;
+
+    int x = -1;
+    int** mapPlayed = map->tab;
+    int nbRow = map->nbLignes;
+    int nbCol = map->nbColonnes;
+    int taux_loot = map->taux_loot;
+
+
+    // Détection de joueur sur case initiale
+    int joueurSurCase = mapPlayed[rowOfBomb][columnOfBomb] / 10000;
+
+    if(joueurSurCase > 0)
+    {
+        Joueur joueur = joueurList[joueurSurCase - 1];
+        updateHealth(joueur);
+    }
+    else
+    {
+        mapPlayed[rowOfBomb][columnOfBomb] = x;
+    }
+
+
+    //int row, col;
+    // col = columnOfBomb;
+    int rowToCheck, colToCheck;
+
+
+    // Explosion vers le haut
+    for (int i = 1; i <= bombe_power; ++i) {
+        colToCheck = columnOfBomb;
+
+        if(rowOfBomb - i < 0)
+        {
+            rowToCheck = nbRow - 1;
         }
-        if (column + k <= map->nbColonnes) {
-            updateMapAfterExplosion(map, b, row, column + k);
+        else
+        {
+            rowToCheck = rowOfBomb - i;
         }
-        if (row - k >= 0) {
-            updateMapAfterExplosion(map, b, row - k, column);
+
+        int elementInTheCase = mapPlayed[rowToCheck][colToCheck];
+
+        int stop = 0;
+
+        switch (elementInTheCase) {
+            case 0:     // case vide
+                mapPlayed[rowToCheck][colToCheck] = x;
+                break;
+            case 1:     // boite
+                mapPlayed[rowToCheck][colToCheck] = dropLoot(taux_loot);
+            case 2:     // mur
+                stop = 1;
+                break;
+
+            default:
+                if(elementInTheCase < 13)     // item
+                {
+                    mapPlayed[rowToCheck][colToCheck] = x;     // destruction de l'item
+                }
+                else
+                {
+                    joueurSurCase = mapPlayed[rowToCheck][colToCheck] / 10000;
+
+                    if(joueurSurCase > 0)       // joueur
+                    {
+                        Joueur joueur = joueurList[joueurSurCase - 1];
+                        if(joueur.alreadyHurt == 0){
+                            updateHealth(joueur);
+                            joueur.alreadyHurt = 1;
+                        }
+                    }
+
+                    int bombeSurCase = mapPlayed[rowToCheck][colToCheck] % 10000;
+                    if(bombeSurCase > 0)    // bombe -> nouvelle explosion
+                    {
+                        int ownerBomb = (bombeSurCase / 1000) - 1;
+                        int new_bombePower = (bombeSurCase % 1000) / 100;
+                        afterExplosion(map, new_bombePower, rowToCheck, colToCheck, joueurList, ownerBomb);
+                    }
+                }
+                break;
         }
-        if (row + k <= map->nbLignes) {
-            updateMapAfterExplosion(map, b, row + k, column);
-        }
-        if (row + k <= map->nbLignes && column + k <= map->nbColonnes) {
-            updateMapAfterExplosion(map, b, row + k, column + k);
-        }
-        if (row - k >= 0 && column - k >= 0) {
-            updateMapAfterExplosion(map, b, row - k, column - k);
-        }
-        if (row + k <= map->nbLignes && column - k >= 0) {
-            updateMapAfterExplosion(map, b, row + k, column - k);
-        }
-        if (row - k >= 0 && column + k <= map->nbColonnes) {
-            updateMapAfterExplosion(map, b, row - k, column + k);
-        }
-        if (k == 2) {
-            if (row + k >= 0 && column - 1 >= 0) {
-                updateMapAfterExplosion(map, b, row + k, column - 1);
-            }
-            if (row - 1 >= 0 && column - k >= 0) {
-                updateMapAfterExplosion(map, b, row - 1, column - k);
-            }
-            if (row - k >= 0 && column - 1 >= 0) {
-                updateMapAfterExplosion(map, b, row - k, column - 1);
-            }
-            if (row + 1 >= 0 && column - k >= 0) {
-                updateMapAfterExplosion(map, b, row + 1, column - k);
-            }
-            if (row + 1 <= map->nbLignes && column + k <= map->nbColonnes) {
-                updateMapAfterExplosion(map, b, row + 1, column + k);
-            }
-            if (row + k <= map->nbLignes && column + 1 <= map->nbColonnes) {
-                updateMapAfterExplosion(map, b, row + k, column + 1);
-            }
-            if (row - k >= 0 && column + 1 <= map->nbColonnes) {
-                updateMapAfterExplosion(map, b, row - k, column + 1);
-            }
-            if (row - 1 >= 0 && column + k <= map->nbColonnes) {
-                updateMapAfterExplosion(map, b, row - 1, column + k);
-            }
+        // Si on rencontre un obstacle, on arrête la fonction
+        if(stop)
+        {
+            break;
         }
     }
 
-    displayMap(map->nbLignes, map->nbColonnes, (Map *) map->tab);
+    // Explosion vers le bas
+    for (int i = 1; i <= bombe_power; ++i) {
+        colToCheck = columnOfBomb;
+
+        if(rowOfBomb + i >= nbRow)
+        {
+            rowToCheck = 0;
+        }
+        else
+        {
+            rowToCheck = rowOfBomb + i;
+        }
+
+        int elementInTheCase = mapPlayed[rowToCheck][colToCheck];
+
+        int stop = 0;
+
+        switch (elementInTheCase) {
+            case 0:     // case vide
+                mapPlayed[rowToCheck][colToCheck] = x;
+                break;
+            case 1:     // boite
+                mapPlayed[rowToCheck][colToCheck] = dropLoot(taux_loot);
+            case 2:     // mur
+                stop = 1;
+                break;
+
+            default:
+                if(elementInTheCase < 13)     // item
+                {
+                    mapPlayed[rowToCheck][colToCheck] = x;     // destruction de l'item
+                }
+                else
+                {
+                    joueurSurCase = mapPlayed[rowToCheck][colToCheck] / 10000;
+
+                    if(joueurSurCase > 0)       // joueur
+                    {
+                        Joueur joueur = joueurList[joueurSurCase - 1];
+                        if(joueur.alreadyHurt == 0){
+                            updateHealth(joueur);
+                            joueur.alreadyHurt = 1;
+                        }
+                    }
+
+                    int bombeSurCase = mapPlayed[rowToCheck][colToCheck] % 10000;
+                    if(bombeSurCase > 0)    // bombe -> nouvelle explosion
+                    {
+                        int ownerBomb = (bombeSurCase / 1000) - 1;
+                        int new_bombePower = (bombeSurCase % 1000) / 100;
+                        afterExplosion(map, new_bombePower, rowToCheck, colToCheck, joueurList, ownerBomb);
+                    }
+                }
+                break;
+        }
+        // Si on rencontre un obstacle, on arrête la fonction
+        if(stop)
+        {
+            break;
+        }
+    }
+
+    // Explosion vers la gauche
+    for (int i = 1; i <= bombe_power; ++i) {
+        rowToCheck = rowOfBomb;
+
+        if(columnOfBomb - i < nbCol)
+        {
+            colToCheck = nbCol - 1;
+        }
+        else
+        {
+            colToCheck = columnOfBomb - i;
+        }
+
+        int elementInTheCase = mapPlayed[rowToCheck][colToCheck];
+
+        int stop = 0;
+
+        switch (elementInTheCase) {
+            case 0:     // case vide
+                mapPlayed[rowToCheck][colToCheck] = x;
+                break;
+            case 1:     // boite
+                mapPlayed[rowToCheck][colToCheck] = dropLoot(taux_loot);
+            case 2:     // mur
+                stop = 1;
+                break;
+
+            default:
+                if(elementInTheCase < 13)     // item
+                {
+                    mapPlayed[rowToCheck][colToCheck] = x;     // destruction de l'item
+                }
+                else
+                {
+                    joueurSurCase = mapPlayed[rowToCheck][colToCheck] / 10000;
+
+                    if(joueurSurCase > 0)       // joueur
+                    {
+                        Joueur joueur = joueurList[joueurSurCase - 1];
+                        if(joueur.alreadyHurt == 0){
+                            updateHealth(joueur);
+                            joueur.alreadyHurt = 1;
+                        }
+                    }
+
+                    int bombeSurCase = mapPlayed[rowToCheck][colToCheck] % 10000;
+                    if(bombeSurCase > 0)    // bombe -> nouvelle explosion
+                    {
+                        int ownerBomb = (bombeSurCase / 1000) - 1;
+                        int new_bombePower = (bombeSurCase % 1000) / 100;
+                        afterExplosion(map, new_bombePower, rowToCheck, colToCheck, joueurList, ownerBomb);
+                    }
+                }
+                break;
+        }
+        // Si on rencontre un obstacle, on arrête la fonction
+        if(stop)
+        {
+            break;
+        }
+    }
+
+    // Explosion vers la droite
+    for (int i = 1; i <= bombe_power; ++i) {
+        rowToCheck = rowOfBomb;
+
+        if(columnOfBomb + i >= nbCol)
+        {
+            colToCheck = 0;
+        }
+        else
+        {
+            colToCheck = columnOfBomb + i;
+        }
+
+        int elementInTheCase = mapPlayed[rowToCheck][colToCheck];
+
+        int stop = 0;
+
+        switch (elementInTheCase) {
+            case 0:     // case vide
+                mapPlayed[rowToCheck][colToCheck] = x;
+                break;
+            case 1:     // boite
+                mapPlayed[rowToCheck][colToCheck] = dropLoot(taux_loot);
+            case 2:     // mur
+                stop = 1;
+                break;
+
+            default:
+                if(elementInTheCase < 13)     // item
+                {
+                    mapPlayed[rowToCheck][colToCheck] = x;     // destruction de l'item
+                }
+                else
+                {
+                    joueurSurCase = mapPlayed[rowToCheck][colToCheck] / 10000;
+
+                    if(joueurSurCase > 0)       // joueur
+                    {
+                        Joueur joueur = joueurList[joueurSurCase - 1];
+                        if(joueur.alreadyHurt == 0){
+                            updateHealth(joueur);
+                            joueur.alreadyHurt = 1;
+                        }
+                    }
+
+                    int bombeSurCase = mapPlayed[rowToCheck][colToCheck] % 10000;
+                    if(bombeSurCase > 0)    // bombe -> nouvelle explosion
+                    {
+                        int ownerBomb = (bombeSurCase / 1000) - 1;
+                        int new_bombePower = (bombeSurCase % 1000) / 100;
+                        afterExplosion(map, new_bombePower, rowToCheck, colToCheck, joueurList, ownerBomb);
+                    }
+                }
+                break;
+        }
+        // Si on rencontre un obstacle, on arrête la fonction
+        if(stop)
+        {
+            break;
+        }
+    }
+
 }
 
 
@@ -301,7 +551,10 @@ void freeMap(Map *m, int r) {
 
 
 void printRules(int x) {
+    // Espace entre la map et les règles
     printf("%c%c%c%c||%c", 255, 255, 255, 255, 255);
+
+    // Affichage des règles
     switch (x) {
         case 0:
             printf("Controles :");
@@ -375,7 +628,7 @@ void displayMap(int r, int c, Map *map) {
     // Lecture de ligne
     for (i = 0; i < ruleLine; ++i) {
         // Lecture de colonne
-        if (i <= r) {
+        if (i < r) {
             for (j = 0; j < c; ++j) {
                 int elementInTheCase = map->tab[i][j];
 
@@ -418,7 +671,8 @@ void displayMap(int r, int c, Map *map) {
                     }
                     printf("%c", graphismesHD[13]);
                     resetColor();
-                } else        // murs + boite + vide + powerup
+                }
+                else if(elementInTheCase >= 0)       // murs + boite + vide + powerup
                 {
                     switch (elementInTheCase) {
                         case 3:
@@ -441,15 +695,24 @@ void displayMap(int r, int c, Map *map) {
                     printf("%c", graphismesHD[elementInTheCase]);
                     resetColor();
                 }
+                else
+                {
+                    if(elementInTheCase == -1){
+                        printf("*");
+                        map->tab[i][j] = 0;
+                    }
+                }
 
                 // Bloc supplémentaire entre chaque case pour les bordures hautes et basses de la map
                 if ((i == 0 || i == r - 1) && (j != c - 1)) {
                     printf("%c", 219);
                 }
             }
-        } else if (ruleLine <= 7) {
-            for (int k = 0; k < (c * 2) - 1; ++k) {
-                printf("%c", 255);
+        } else
+            //
+            if (ruleLine <= 7) {
+                for (int k = 0; k < (c * 2) - 1; ++k) {
+                    printf("%c", 255);
             }
         }
 
@@ -487,16 +750,16 @@ void displayATH(Joueur player, int actualPlayer) {
     // Format d'une ligne d'ATH :
     // J1: x1 ♥ (+0♦) | 3/10 ó | x3 POWA | boots
     // Ajout de %c (255) à la fin des print pour être sûr d'avoir l'espace insecable
-    printf("J%d:%c", player.id, 255);
-    printf("x%d%c%c", player.nbVies, 3, 255);
+    printf("J%d:%c", player.id, 255);                                       // ID player
+    printf("x%d%c%c", player.nbVies, 3, 255);                               // Vies
     int bouclier = player.coeur == -1 ? 0 : player.coeur;
-    printf("(+%d%c)%c", bouclier, 4, 255);
+    printf("(+%d%c)%c", bouclier, 4, 255);                                  // Bouclier
     int bombesEnPoche = player.nbBombesMax - player.nbBombesActuel;
-    printf("| %d/%d %c%c", bombesEnPoche, player.nbBombesMax, 162, 255);
-    printf("| x%d POWA%c", player.powerBombe, 255);
+    printf("| %d/%d %c%c", bombesEnPoche, player.nbBombesMax, 162, 255);    // Bombes
+    printf("| x%d POWA%c", player.powerBombe, 255);                         // Puissance
 
     // equipement
-    printf("|%c", 255);
+    printf("|%cequipement :%c", 255, 255);
     if (player.boots == 1) {
         printf("boots");
     } else if (player.pass == 1) {
@@ -508,3 +771,103 @@ void displayATH(Joueur player, int actualPlayer) {
     resetColor();
     printf("\n");
 }
+
+
+// TODO : DELETE
+void displayMapDEBUG(int r, int c, Map *map) {
+    int i, j, ruleLine;
+
+    // Definition des caracteres à utiliser pour l'affichage
+    //int graphismesHD[] = {255, 176, 219, 42, 42, 43, 43, 112, 98, 4, 3, 5, 6, 162};
+
+    // Verification de la hauteur de la map pour le bon affichage des regles
+    ruleLine = r < 7 ? 7 : r;
+
+    // Lecture de ligne
+    for (i = 0; i < ruleLine; ++i) {
+        // Lecture de colonne
+        if (i < r) {
+            for (j = 0; j < c; ++j) {
+                int elementInTheCase = map->tab[i][j];
+
+                // espaces entre les cases (esthetisme)
+                if ((i != 0 && i != r - 1) && (j > 0)) {
+                    printf(" ");
+                }
+
+                // affichage du contenu des cases
+                if (elementInTheCase >= 10000)       // joueur
+                {
+                    elementInTheCase /= 10000;  // récupération du numéro du joueur
+
+                    // Apply color to the player token
+                    switch (elementInTheCase) {
+                        case 1 :
+                            red();
+                            break;
+                        case 2 :
+                            cyan();
+                            break;
+                        case 3 :
+                            green();
+                            break;
+                        case 4 :
+                            yellow();
+                            break;
+                        default:
+                            resetColor();
+                    }
+
+                    printf("%d", elementInTheCase);
+                    resetColor();
+                } else if (elementInTheCase >= 1000)       // bombes
+                {
+                    // bombe s'affiche en rouge si elle est sur le point d'exploser
+                    int timer = elementInTheCase % 10;
+                    if (timer == 1) {
+                        red();
+                    }
+                    printf("%d", elementInTheCase);
+                    resetColor();
+                } else        // murs + boite + vide + powerup
+                {
+                    switch (elementInTheCase) {
+                        case 3:
+                            green();
+                            break;
+                        case 4:
+                        case 12:
+                            red();
+                            break;
+                        case 5:
+                            yellow();
+                            break;
+                        case 6:
+                            blue();
+                            break;
+                        default:
+                            break;
+                    }
+
+                    printf("%d", elementInTheCase);
+                    resetColor();
+                }
+
+                // Bloc supplémentaire entre chaque case pour les bordures hautes et basses de la map
+                if ((i == 0 || i == r - 1) && (j != c - 1)) {
+                    printf("%d", 219);
+                }
+            }
+        } else
+            //
+        if (ruleLine <= 7) {
+            for (int k = 0; k < (c * 2) - 1; ++k) {
+                printf("%d", 255);
+            }
+        }
+
+        printRules(i);
+        printf("\n");
+    }
+}
+

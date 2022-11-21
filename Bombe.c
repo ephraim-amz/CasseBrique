@@ -23,7 +23,7 @@ int dropLoot(int taux_loot) {
         // nbBombe -- :     19%
         // power ++ :       19%
         // power -- :       19%
-        // équipement :     10% (50% boots, 50% pass)
+        // équipement :     10% (5% boots, 5% pass)
         // coeur :          5%
         // vie :            5%
         // invul :          3%

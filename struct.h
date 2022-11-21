@@ -20,6 +20,7 @@ typedef struct {
     int boots;              // équipement permettant de déplacer les bombes
     int pass;               // équipement permettant de passer sur une bombe
     int invincible;         // nombre de tours d'invincibilite
+    int alreadyHurt;        // dit si le joueur a déjà été blessé dans le tour
 
     // TODO : verif
     Bombe *bombes;

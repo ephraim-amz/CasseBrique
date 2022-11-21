@@ -1,6 +1,6 @@
 1       // nb bombe base
 7       // nbLignes
-7       //nbColonnes
+7       // nbColonnes
 4       // nbMaxPlayer
 2       // taux_loot
 1       // start_nbVies

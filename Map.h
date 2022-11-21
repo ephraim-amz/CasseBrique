@@ -12,34 +12,7 @@
 #include "Bombe.h"
 
 
-/**
- * @brief Structure map
- */
- /*
-typedef struct {
-    // Infos de la map
-    //int* tab; // Le tableau en 2d
-    int** tab; // Le tableau en 2d
-
-    int nbLignes;
-    int nbColonnes;
-    int taux_loot;        // chance qu'une caisse lache un item = 1/taux_loot
-
-    // Infos pour initialiser les joueurs
-    int nbMaxPlayer;
-
-    int start_nbVies;
-    int start_coeur;
-    int start_nbBombe;
-    int start_powerBombe;
-    int bombe_compteur;
-    int start_boots;
-    int start_pass;
-    struct Joueur *joueurs; // La liste des joueurs
-} Map;
-*/
-
-Map *createMap(int nbLignes, int nbColonnes, int nbVies, int nbMaxPlayer, int nbBombeBase, int txLoot);
+Map *createMap(int nbLignes, int nbColonnes, int nbVies, int nbCoeur, int nbMaxPlayer, int nbBombeBase, int txLoot, int start_powerBombe, int bombe_compteur, int start_boots, int start_pass);
 
 Joueur* createJoueurFromMapData(Map* mapPlayed);
 
@@ -67,11 +40,17 @@ int *getInfos(char *filename);
 
 void freeMap(Map *map, int r);
 
-void updateMapAfterExplosion(Map *map, Bombe b, int i, int j);
+void updateMapAfterExplosion(Map *map, int bombe_power, int i, int j);
 
-void afterExplosion(Map *map, Bombe b, int row, int j);
+
+
+
+void updateHealth(Joueur joueur);
+
+void afterExplosion(Map *map, int bombe_power, int rowOfBomb, int columnOfBomb, Joueur* joueurList, int owner);
 
 void displayMap(int r, int c, Map* map);
+void displayMapDEBUG(int r, int c, Map* map);
 //void displayMap(int r, int c, int** map);
 
 

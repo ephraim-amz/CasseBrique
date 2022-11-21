@@ -7,10 +7,10 @@
 #define CASSEBRIQUE_DECREMENTATION_H
 
 
-int decrementationMap(Map *m);
+void decrementationMap(Map *m);
 
 int boom(Map *m);
 
-int decrementation(int **tab, int r, int c, Joueur *joueur_array, int nbr_players);
+void decrementationInvul(Joueur* playerList, int maxPlayer);
 
 #endif //CASSEBRIQUE_DECREMENTATION_H
